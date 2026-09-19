@@ -1,19 +1,43 @@
-name: QA
+name: AI Learning Studio QA
+
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
-  static-qa:
+  qa:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
         with:
           python-version: "3.x"
-      - run: python3 qa_test.py
-      - run: python3 -m py_compile server.py
-      - uses: actions/setup-node@v4
+
+      - name: Run static QA
+        run: python3 qa_test.py
+
+      - name: Check Python syntax
+        run: python3 -m py_compile server.py qa_test.py
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
         with:
-          node-version: "20"
-      - run: node --check app.js
-      - run: node --check curriculum.js
+          node-version: "24"
+
+      - name: Check JavaScript syntax
+        run: |
+          node --check app.js
+          node --check curriculum.js
+          node --check learning-engine.js
+          node --check learning-engine.test.js
+
+      - name: Run learning engine tests
+        run: node learning-engine.test.js
