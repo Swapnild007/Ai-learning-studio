@@ -73,27 +73,6 @@ function layout(title, subtitle, body) {
   `;
 }
 
-function renderNav() {
-  const moduleNav = $("#moduleNav");
-  if (!moduleNav) return;
-
-  moduleNav.innerHTML = CURRICULUM.modules
-    .map(
-      (module) => `
-        <button class="module-link" data-module="${escapeAttribute(module.id)}">
-          M${module.number} · ${escapeHtml(module.title)}
-        </button>
-      `
-    )
-    .join("");
-
-  $$("[data-module]").forEach((button) => {
-    button.addEventListener("click", () => {
-      showModule(button.dataset.module);
-    });
-  });
-}
-
 function home() {
   const next =
     LESSONS.find((lesson) => !state.completed.has(lesson.id)) ||
@@ -555,16 +534,36 @@ function updateActiveNavigation(activeButton) {
 }
 
 function bindGlobalEvents() {
-  $$(".nav-item").forEach((button) => {
+  const sidebar = $("#sidebar");
+  const menuButton = $("#menuBtn");
+  const menuBackdrop = $("#menuBackdrop");
+
+  const setMenuOpen = (open) => {
+    sidebar?.classList.toggle("open", open);
+    menuBackdrop?.classList.toggle("open", open);
+    menuButton?.setAttribute("aria-expanded", String(open));
+    menuButton?.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
+  };
+
+  $(".nav-item").forEach((button) => {
     button.addEventListener("click", () => {
       route(button.dataset.view);
-      $("#sidebar")?.classList.remove("open");
+      setMenuOpen(false);
       updateActiveNavigation(button);
     });
   });
 
-  $("#menuBtn")?.addEventListener("click", () => {
-    $("#sidebar")?.classList.toggle("open");
+  menuButton?.addEventListener("click", () => {
+    setMenuOpen(!sidebar?.classList.contains("open"));
+  });
+
+  menuBackdrop?.addEventListener("click", () => setMenuOpen(false));
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      setMenuOpen(false);
+      closeSearch();
+    }
   });
 
   $("#searchBtn")?.addEventListener("click", openSearch);
@@ -628,7 +627,6 @@ function bindGlobalEvents() {
 }
 
 function initialize() {
-  renderNav();
   bindGlobalEvents();
   home();
 }
