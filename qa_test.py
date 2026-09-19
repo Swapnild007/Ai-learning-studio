@@ -50,6 +50,8 @@ for token in [
     "localStorage",
     "openLesson",
     "escapeHtml",
+    "menuBackdrop",
+    "setMenuOpen",
 ]:
     assert token in app, f"Missing app token: {token}"
 
@@ -62,5 +64,8 @@ for token in ["max-width:1320px", "prefers-reduced-motion", "overflow-x:hidden"]
 # The layout must remain shrinkable at small viewports and explicitly suppress accidental horizontal overflow.
 assert "main{flex:1;min-width:0" in css, "Main content is not shrink-safe"
 assert "grid-template-columns:1fr" in css, "Mobile single-column layout is missing"
+assert "menu-backdrop" in css, "Mobile menu backdrop is missing"
+assert 'id="menuBackdrop"' in html, "Mobile menu backdrop element is missing"
+assert 'id="moduleNav"' not in html, "Curriculum is incorrectly exposed as a separate navigation block"
 
 print("Static QA PASS")
