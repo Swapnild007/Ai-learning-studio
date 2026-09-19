@@ -1,1 +1,636 @@
-const state={view:"home",lesson:null,completed:new Set(JSON.parse(localStorage.getItem("als-completed")||"[]"))};const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];function save(){localStorage.setItem("als-completed",JSON.stringify([...state.completed]))}function toast(msg){const e=$("#toast");e.textContent=msg;e.classList.add("show");setTimeout(()=>e.classList.remove("show"),1800)}function progress(){return Math.round(state.completed.size/LESSONS.length*100)}function moduleLessons(id){return LESSONS.filter(x=>x.module===id)}function renderNav(){$("#moduleNav").innerHTML=CURRICULUM.modules.map(m=>'<button class="module-link" data-module="'+m.id+'">M'+m.number+" · "+m.title+"</button>").join("");$$("[data-module]").forEach(b=>b.onclick=()=>showModule(b.dataset.module))}function layout(title,sub,body){$("#main").innerHTML='<div class="section-head"><div><div class="kicker">'+title+'</div><p>'+sub+"</p></div></div>"+body}function home(){const next=LESSONS.find(x=>!state.completed.has(x.id))||LESSONS[0];layout("Today","A calm workspace for deliberate learning.",'<section class="hero"><div class="hero-card"><div class="kicker">Continue learning</div><h1>'+next.title+'</h1><p>'+next.objective+'</p><button class="action" style="width:auto;padding:13px 20px" onclick="openLesson(\''+next.id+"')\">Continue lesson</button></div><div class=\"metric-card card\"><div><div class=\"metric-label\">Curriculum progress</div><div class=\"metric-value\">"+progress()+"%</div></div><div><div class=\"progress\"><i style=\"width:"+progress()+"%\"></i></div><div class=\"metric-label\" style=\"margin-top:9px\">"+state.completed.size+" of "+LESSONS.length+" lessons completed</div></div></div></section><div class=\"section-head\"><div><h2>Curriculum</h2><p>Six connected learning domains. Every lesson follows theory → implementation → evidence.</p></div></div><div class=\"grid\">"+CURRICULUM.modules.map(m=>'<article class="card module-card"><div><div class="module-num">MODULE '+m.number+'</div><h3>'+m.title+'</h3><p>'+m.desc+'</p></div><div><div class="pill-row">'+m.tags.map(t=>'<span class="pill">'+t+"</span>").join("")+'</div><button class="action secondary" onclick="showModule(\''+m.id+"')\">Open module</button></div></article>").join("")+"</div>")}function showModule(id){const m=CURRICULUM.modules.find(x=>x.id===id),ls=moduleLessons(id);layout("Module "+m.number,m.title,'<div class="card" style="margin-bottom:16px"><h2 style="margin:0 0 8px">'+m.title+'</h2><p style="color:var(--muted)">'+m.desc+'</p><div class="pill-row">'+m.units.map(u=>'<span class="pill">'+u[0]+"</span>").join("")+'</div></div><div class="lesson-list">'+ls.map(l=>lessonRow(l)).join("")+"</div>");bindRows()}function lessonRow(l){const done=state.completed.has(l.id);return '<button class="lesson-row '+(done?"done":"")+'" data-open="'+l.id+'"><span class="check">'+(done?"✓":"")+'</span><span><strong>'+l.id+" · "+l.title+'</strong><small>'+l.unit+" · "+l.stage+"</small></span></button>"}function bindRows(){$$("[data-open]").forEach(b=>b.onclick=()=>openLesson(b.dataset.open))}function escapeHtml(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}function openLesson(id){const l=LESSONS.find(x=>x.id===id);if(!l)return;state.lesson=id;$("#main").innerHTML='<div class="lesson-layout"><article class="card reader"><div class="kicker">'+l.id+" · "+l.moduleTitle+'</div><h1>'+l.title+'</h1><p class="lead">'+l.objective+'</p><div class="dossier"><section class="dossier-section"><h3>Prerequisites</h3><p>'+l.prerequisite+'</p></section><section class="dossier-section"><h3>Mathematical model</h3><p>'+l.math+'</p></section><section class="dossier-section"><h3>Mechanism</h3><p>'+l.mechanism+'</p></section><section class="dossier-section"><h3>Implementation</h3><p>'+l.implementation+'</p><pre class="code">'+escapeHtml(l.code)+'</pre></section><section class="dossier-section"><h3>Experiment</h3><p>'+l.experiment+'</p></section><section class="dossier-section"><h3>Failure analysis</h3><p>'+l.failure+'</p></section><section class="dossier-section"><h3>Mastery evidence</h3><p>'+l.evidence+'</p></section><section class="dossier-section"><h3>Checkpoint</h3><ul>'+l.checkpoint.map(x=>"<li>"+x+"</li>").join("")+"</ul></section></div></article><aside class="card side-card"><div class="kicker">'+l.stage+'</div><h3>'+l.unit+'</h3><p style="color:var(--muted);font-size:12px;line-height:1.6">A lesson is complete only when the learner can produce evidence, not merely recall the concept.</p><button class="action" id="completeBtn">'+(state.completed.has(l.id)?"Completed ✓":"Mark complete")+'</button><button class="action secondary" onclick="showModule(\''+l.module+"')\">Back to module</button></aside></div>";$("#completeBtn").onclick=()=>{state.completed.has(l.id)?state.completed.delete(l.id):state.completed.add(l.id);save();openLesson(id);toast(state.completed.has(l.id)?"Lesson completed":"Completion reset")};window.scrollTo({top:0,behavior:"smooth"})}function learn(){layout("Learn","Browse the full learning sequence.",'<div class="grid">'+CURRICULUM.modules.map(m=>'<article class="card module-card"><div><div class="module-num">MODULE '+m.number+'</div><h3>'+m.title+'</h3><p>'+m.desc+'</p></div><button class="action secondary" onclick="showModule(\''+m.id+"')\">Browse "+moduleLessons(m.id).length+" lessons</button></article>").join("")+"</div>")}function progressView(){layout("Progress","Evidence-based progress across the curriculum.",'<div class="card" style="padding:28px"><div class="metric-value">'+progress()+'%</div><p style="color:var(--muted)">'+state.completed.size+" completed of "+LESSONS.length+' lessons.</p><div class="progress"><i style="width:'+progress()+'%"></i></div></div><div class="grid" style="margin-top:16px">'+CURRICULUM.modules.map(m=>{const a=moduleLessons(m.id),d=a.filter(x=>state.completed.has(x.id)).length;return '<div class="card"><div class="module-num">M'+m.number+'</div><h3>'+m.title+'</h3><p style="color:var(--muted)">'+d+"/"+a.length+' lessons</p><div class="progress"><i style="width:'+(d/a.length*100)+'%"></i></div></div>'}).join("")+"</div>")}function labs(){layout("Labs","Experiments are first-class learning objects.",'<div class="grid">'+["Numerical stability","Gradient checking","Evaluation harness","Attention visualization","Retrieval evaluation","Inference benchmarking"].map((x,i)=>'<article class="card"><div class="module-num">LAB '+String(i+1).padStart(2,"0")+'</div><h3>'+x+'</h3><p style="color:var(--muted)">Run a controlled experiment, change one variable and preserve the evidence.</p><button class="action secondary" onclick="toast(\'Lab workspace scaffolded\')">Open lab</button></article>').join("")+"</div>")}function projects(){layout("Projects","Portfolio artifacts built from the curriculum.",'<div class="grid">'+["From-scratch ML baseline","Neural network + debugging log","Minimal GPT + tokenizer","Distributed training benchmark","Agent + red-team report","Research ablation"].map((x,i)=>'<article class="card"><div class="module-num">PROJECT '+String(i+1).padStart(2,"0")+'</div><h3>'+x+'</h3><p style="color:var(--muted)">Artifact-driven work with code, measurements, limitations and reproducibility notes.</p></article>').join("")+"</div>")}function route(v){state.view=v;({home,learn,labs,projects,progress:progressView}[v]||home)()}$$(".nav-item").forEach(b=>b.onclick=()=>{route(b.dataset.view);$("#sidebar").classList.remove("open");$$(".nav-item").forEach(x=>x.classList.toggle("active",x===b))});$("#menuBtn").onclick=()=>$("#sidebar").classList.toggle("open");function openSearch(){$("#searchSheet").classList.add("open");$("#sheetBackdrop").classList.add("open");$("#searchInput").focus()}function closeSearch(){$("#searchSheet").classList.remove("open");$("#sheetBackdrop").classList.remove("open")}$("#searchBtn").onclick=openSearch;$("#closeSearch").onclick=closeSearch;$("#sheetBackdrop").onclick=closeSearch;$("#searchInput").oninput=e=>{const q=e.target.value.trim().toLowerCase();const r=$("#searchResults");if(!q){r.innerHTML="<p style='color:var(--muted);font-size:12px'>Type a concept, unit or lesson.</p>";return}const hits=LESSONS.filter(l=>(l.title+" "+l.unit+" "+l.moduleTitle+" "+l.scope).toLowerCase().includes(q)).slice(0,30);r.innerHTML=hits.length?hits.map(l=>'<div class="search-result"><button onclick="closeSearch();openLesson(\''+l.id+"')\"><strong>"+l.id+" · "+l.title+'</strong><div style="font-size:11px;color:var(--muted);margin-top:3px">'+l.moduleTitle+" · "+l.unit+"</div></button></div>").join(""):"<p style='color:var(--muted);font-size:12px'>No matching lesson.</p>"};renderNav();home();
+const state = {
+  view: "home",
+  lesson: null,
+  completed: new Set(loadCompleted())
+};
+
+const $ = (selector) => document.querySelector(selector);
+const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+function loadCompleted() {
+  try {
+    const raw = localStorage.getItem("als-completed");
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+  } catch {
+    return [];
+  }
+}
+
+function save() {
+  localStorage.setItem(
+    "als-completed",
+    JSON.stringify([...state.completed])
+  );
+}
+
+function toast(message) {
+  const element = $("#toast");
+  if (!element) return;
+
+  element.textContent = message;
+  element.classList.add("show");
+
+  window.setTimeout(() => {
+    element.classList.remove("show");
+  }, 1800);
+}
+
+function progress() {
+  if (!LESSONS.length) return 0;
+  return Math.round((state.completed.size / LESSONS.length) * 100);
+}
+
+function moduleLessons(moduleId) {
+  return LESSONS.filter((lesson) => lesson.module === moduleId);
+}
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"]/g, (character) => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;"
+  })[character]);
+}
+
+function escapeAttribute(value) {
+  return escapeHtml(value).replace(/'/g, "&#39;");
+}
+
+function layout(title, subtitle, body) {
+  const main = $("#main");
+  if (!main) return;
+
+  main.innerHTML = `
+    <div class="section-head">
+      <div>
+        <div class="kicker">${escapeHtml(title)}</div>
+        <p>${escapeHtml(subtitle)}</p>
+      </div>
+    </div>
+    ${body}
+  `;
+}
+
+function renderNav() {
+  const moduleNav = $("#moduleNav");
+  if (!moduleNav) return;
+
+  moduleNav.innerHTML = CURRICULUM.modules
+    .map(
+      (module) => `
+        <button class="module-link" data-module="${escapeAttribute(module.id)}">
+          M${module.number} · ${escapeHtml(module.title)}
+        </button>
+      `
+    )
+    .join("");
+
+  $$("[data-module]").forEach((button) => {
+    button.addEventListener("click", () => {
+      showModule(button.dataset.module);
+    });
+  });
+}
+
+function home() {
+  const next =
+    LESSONS.find((lesson) => !state.completed.has(lesson.id)) ||
+    LESSONS[0];
+
+  if (!next) {
+    layout("Today", "Your learning workspace.", `
+      <section class="card">
+        <h2>Curriculum is ready</h2>
+        <p>No learning objects are currently available.</p>
+      </section>
+    `);
+    return;
+  }
+
+  const percentage = progress();
+
+  layout(
+    "Today",
+    "A calm workspace for deliberate learning.",
+    `
+      <section class="hero">
+        <div class="hero-card">
+          <div class="kicker">Continue learning</div>
+          <h1>${escapeHtml(next.title)}</h1>
+          <p>${escapeHtml(next.objective)}</p>
+          <button class="action" id="continueLesson">
+            Continue lesson
+          </button>
+        </div>
+
+        <div class="metric-card card">
+          <div>
+            <div class="metric-label">Curriculum progress</div>
+            <div class="metric-value">${percentage}%</div>
+          </div>
+
+          <div>
+            <div class="progress">
+              <i style="width:${percentage}%"></i>
+            </div>
+            <div class="metric-label" style="margin-top:9px">
+              ${state.completed.size} of ${LESSONS.length} learning objects completed
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="section-head">
+        <div>
+          <h2>Curriculum</h2>
+          <p>
+            Six connected domains. Experiences will increasingly adapt to
+            capability rather than force a fixed sequence.
+          </p>
+        </div>
+      </div>
+
+      <div class="grid">
+        ${CURRICULUM.modules.map(moduleCard).join("")}
+      </div>
+    `
+  );
+
+  $("#continueLesson")?.addEventListener("click", () => {
+    openLesson(next.id);
+  });
+
+  $$("[data-open-module]").forEach((button) => {
+    button.addEventListener("click", () => {
+      showModule(button.dataset.openModule);
+    });
+  });
+}
+
+function moduleCard(module) {
+  return `
+    <article class="card module-card">
+      <div>
+        <div class="module-num">MODULE ${module.number}</div>
+        <h3>${escapeHtml(module.title)}</h3>
+        <p>${escapeHtml(module.desc)}</p>
+      </div>
+
+      <div>
+        <div class="pill-row">
+          ${module.tags
+            .map((tag) => `<span class="pill">${escapeHtml(tag)}</span>`)
+            .join("")}
+        </div>
+
+        <button
+          class="action secondary"
+          data-open-module="${escapeAttribute(module.id)}"
+        >
+          Open module
+        </button>
+      </div>
+    </article>
+  `;
+}
+
+function showModule(moduleId) {
+  const module = CURRICULUM.modules.find((item) => item.id === moduleId);
+
+  if (!module) {
+    toast("Module not found");
+    return;
+  }
+
+  const lessons = moduleLessons(moduleId);
+
+  layout(
+    `Module ${module.number}`,
+    module.title,
+    `
+      <div class="card" style="margin-bottom:16px">
+        <h2 style="margin:0 0 8px">${escapeHtml(module.title)}</h2>
+        <p style="color:var(--muted)">
+          ${escapeHtml(module.desc)}
+        </p>
+
+        <div class="pill-row">
+          ${module.units
+            .map(
+              ([unit]) =>
+                `<span class="pill">${escapeHtml(unit)}</span>`
+            )
+            .join("")}
+        </div>
+      </div>
+
+      <div class="lesson-list">
+        ${lessons.map(lessonRow).join("")}
+      </div>
+    `
+  );
+
+  bindLessonRows();
+}
+
+function lessonRow(lesson) {
+  const done = state.completed.has(lesson.id);
+
+  return `
+    <button
+      class="lesson-row ${done ? "done" : ""}"
+      data-open-lesson="${escapeAttribute(lesson.id)}"
+    >
+      <span class="check">${done ? "✓" : ""}</span>
+      <span>
+        <strong>${escapeHtml(lesson.id)} · ${escapeHtml(lesson.title)}</strong>
+        <small>${escapeHtml(lesson.unit)} · ${escapeHtml(lesson.stage)}</small>
+      </span>
+    </button>
+  `;
+}
+
+function bindLessonRows() {
+  $$("[data-open-lesson]").forEach((button) => {
+    button.addEventListener("click", () => {
+      openLesson(button.dataset.openLesson);
+    });
+  });
+}
+
+function openLesson(lessonId) {
+  const lesson = LESSONS.find((item) => item.id === lessonId);
+
+  if (!lesson) {
+    toast("Learning object not found");
+    return;
+  }
+
+  state.lesson = lessonId;
+
+  $("#main").innerHTML = `
+    <div class="lesson-layout">
+      <article class="card reader">
+        <div class="kicker">
+          ${escapeHtml(lesson.id)} · ${escapeHtml(lesson.moduleTitle)}
+        </div>
+
+        <h1>${escapeHtml(lesson.title)}</h1>
+        <p class="lead">${escapeHtml(lesson.objective)}</p>
+
+        <div class="dossier">
+          ${dossierSection("Prerequisites", lesson.prerequisite)}
+          ${dossierSection("Mathematical model", lesson.math)}
+          ${dossierSection("Mechanism", lesson.mechanism)}
+
+          <section class="dossier-section">
+            <h3>Implementation</h3>
+            <p>${escapeHtml(lesson.implementation)}</p>
+            <pre class="code">${escapeHtml(lesson.code)}</pre>
+          </section>
+
+          ${dossierSection("Experiment", lesson.experiment)}
+          ${dossierSection("Failure analysis", lesson.failure)}
+          ${dossierSection("Mastery evidence", lesson.evidence)}
+
+          <section class="dossier-section">
+            <h3>Checkpoint</h3>
+            <ul>
+              ${lesson.checkpoint
+                .map((item) => `<li>${escapeHtml(item)}</li>`)
+                .join("")}
+            </ul>
+          </section>
+        </div>
+      </article>
+
+      <aside class="card side-card">
+        <div class="kicker">${escapeHtml(lesson.stage)}</div>
+        <h3>${escapeHtml(lesson.unit)}</h3>
+
+        <p style="color:var(--muted);font-size:12px;line-height:1.6">
+          Completion is only a progress signal. Future versions will require
+          demonstrated evidence for capability progression.
+        </p>
+
+        <button class="action" id="completeBtn">
+          ${state.completed.has(lesson.id) ? "Completed ✓" : "Mark complete"}
+        </button>
+
+        <button class="action secondary" id="backToModule">
+          Back to module
+        </button>
+      </aside>
+    </div>
+  `;
+
+  $("#completeBtn")?.addEventListener("click", () => {
+    if (state.completed.has(lessonId)) {
+      state.completed.delete(lessonId);
+      save();
+      openLesson(lessonId);
+      toast("Completion reset");
+      return;
+    }
+
+    state.completed.add(lessonId);
+    save();
+    openLesson(lessonId);
+    toast("Learning object completed");
+  });
+
+  $("#backToModule")?.addEventListener("click", () => {
+    showModule(lesson.module);
+  });
+
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function dossierSection(title, content) {
+  return `
+    <section class="dossier-section">
+      <h3>${escapeHtml(title)}</h3>
+      <p>${escapeHtml(content)}</p>
+    </section>
+  `;
+}
+
+function learn() {
+  layout(
+    "Explore",
+    "Browse the current curriculum map.",
+    `
+      <div class="grid">
+        ${CURRICULUM.modules
+          .map(
+            (module) => `
+              <article class="card module-card">
+                <div>
+                  <div class="module-num">MODULE ${module.number}</div>
+                  <h3>${escapeHtml(module.title)}</h3>
+                  <p>${escapeHtml(module.desc)}</p>
+                </div>
+
+                <button
+                  class="action secondary"
+                  data-open-module="${escapeAttribute(module.id)}"
+                >
+                  Browse ${moduleLessons(module.id).length} learning objects
+                </button>
+              </article>
+            `
+          )
+          .join("")}
+      </div>
+    `
+  );
+
+  $$("[data-open-module]").forEach((button) => {
+    button.addEventListener("click", () => {
+      showModule(button.dataset.openModule);
+    });
+  });
+}
+
+function progressView() {
+  const percentage = progress();
+
+  layout(
+    "Progress",
+    "Progress is a signal. Evidence will become the primary mastery record.",
+    `
+      <div class="card" style="padding:28px">
+        <div class="metric-value">${percentage}%</div>
+        <p style="color:var(--muted)">
+          ${state.completed.size} completed of ${LESSONS.length} learning objects.
+        </p>
+
+        <div class="progress">
+          <i style="width:${percentage}%"></i>
+        </div>
+      </div>
+
+      <div class="grid" style="margin-top:16px">
+        ${CURRICULUM.modules
+          .map((module) => {
+            const lessons = moduleLessons(module.id);
+            const completed = lessons.filter((lesson) =>
+              state.completed.has(lesson.id)
+            ).length;
+            const moduleProgress = lessons.length
+              ? Math.round((completed / lessons.length) * 100)
+              : 0;
+
+            return `
+              <div class="card">
+                <div class="module-num">M${module.number}</div>
+                <h3>${escapeHtml(module.title)}</h3>
+                <p style="color:var(--muted)">
+                  ${completed}/${lessons.length} learning objects
+                </p>
+                <div class="progress">
+                  <i style="width:${moduleProgress}%"></i>
+                </div>
+              </div>
+            `;
+          })
+          .join("")}
+      </div>
+    `
+  );
+}
+
+function labs() {
+  const labNames = [
+    "Numerical stability",
+    "Gradient checking",
+    "Evaluation harness",
+    "Attention visualization",
+    "Retrieval evaluation",
+    "Inference benchmarking"
+  ];
+
+  layout(
+    "Labs",
+    "Experiments are first-class learning objects.",
+    `
+      <div class="grid">
+        ${labNames
+          .map(
+            (name, index) => `
+              <article class="card">
+                <div class="module-num">
+                  LAB ${String(index + 1).padStart(2, "0")}
+                </div>
+                <h3>${escapeHtml(name)}</h3>
+                <p style="color:var(--muted)">
+                  Run a controlled experiment, change one variable and preserve
+                  the evidence.
+                </p>
+                <button class="action secondary" data-lab>
+                  Open lab
+                </button>
+              </article>
+            `
+          )
+          .join("")}
+      </div>
+    `
+  );
+
+  $$("[data-lab]").forEach((button) => {
+    button.addEventListener("click", () => {
+      toast("Lab workspace is the next vertical slice");
+    });
+  });
+}
+
+function projects() {
+  const projectNames = [
+    "From-scratch ML baseline",
+    "Neural network + debugging log",
+    "Minimal GPT + tokenizer",
+    "Distributed training benchmark",
+    "Agent + red-team report",
+    "Research ablation"
+  ];
+
+  layout(
+    "Projects",
+    "Portfolio artifacts built from the curriculum.",
+    `
+      <div class="grid">
+        ${projectNames
+          .map(
+            (name, index) => `
+              <article class="card">
+                <div class="module-num">
+                  PROJECT ${String(index + 1).padStart(2, "0")}
+                </div>
+                <h3>${escapeHtml(name)}</h3>
+                <p style="color:var(--muted)">
+                  Artifact-driven work with code, measurements, limitations and
+                  reproducibility notes.
+                </p>
+              </article>
+            `
+          )
+          .join("")}
+      </div>
+    `
+  );
+}
+
+function route(view) {
+  state.view = view;
+
+  const routes = {
+    home,
+    learn,
+    labs,
+    projects,
+    progress: progressView
+  };
+
+  (routes[view] || home)();
+}
+
+function openSearch() {
+  $("#searchSheet")?.classList.add("open");
+  $("#sheetBackdrop")?.classList.add("open");
+  $("#searchInput")?.focus();
+}
+
+function closeSearch() {
+  $("#searchSheet")?.classList.remove("open");
+  $("#sheetBackdrop")?.classList.remove("open");
+}
+
+function updateActiveNavigation(activeButton) {
+  $$(".nav-item").forEach((button) => {
+    button.classList.toggle("active", button === activeButton);
+  });
+}
+
+function bindGlobalEvents() {
+  $$(".nav-item").forEach((button) => {
+    button.addEventListener("click", () => {
+      route(button.dataset.view);
+      $("#sidebar")?.classList.remove("open");
+      updateActiveNavigation(button);
+    });
+  });
+
+  $("#menuBtn")?.addEventListener("click", () => {
+    $("#sidebar")?.classList.toggle("open");
+  });
+
+  $("#searchBtn")?.addEventListener("click", openSearch);
+  $("#closeSearch")?.addEventListener("click", closeSearch);
+  $("#sheetBackdrop")?.addEventListener("click", closeSearch);
+
+  $("#searchInput")?.addEventListener("input", (event) => {
+    const query = event.target.value.trim().toLowerCase();
+    const results = $("#searchResults");
+
+    if (!results) return;
+
+    if (!query) {
+      results.innerHTML =
+        '<p style="color:var(--muted);font-size:12px">Type a concept, unit or learning object.</p>';
+      return;
+    }
+
+    const matches = LESSONS.filter((lesson) =>
+      [
+        lesson.title,
+        lesson.unit,
+        lesson.moduleTitle,
+        lesson.scope
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(query)
+    ).slice(0, 30);
+
+    if (!matches.length) {
+      results.innerHTML =
+        '<p style="color:var(--muted);font-size:12px">No matching learning object.</p>';
+      return;
+    }
+
+    results.innerHTML = matches
+      .map(
+        (lesson) => `
+          <div class="search-result">
+            <button data-search-lesson="${escapeAttribute(lesson.id)}">
+              <strong>
+                ${escapeHtml(lesson.id)} · ${escapeHtml(lesson.title)}
+              </strong>
+              <div style="font-size:11px;color:var(--muted);margin-top:3px">
+                ${escapeHtml(lesson.moduleTitle)} · ${escapeHtml(lesson.unit)}
+              </div>
+            </button>
+          </div>
+        `
+      )
+      .join("");
+
+    $$("[data-search-lesson]").forEach((button) => {
+      button.addEventListener("click", () => {
+        closeSearch();
+        openLesson(button.dataset.searchLesson);
+      });
+    });
+  });
+}
+
+function initialize() {
+  renderNav();
+  bindGlobalEvents();
+  home();
+}
+
+initialize();
