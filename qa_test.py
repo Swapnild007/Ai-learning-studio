@@ -55,7 +55,12 @@ for token in [
 
 for breakpoint in ["@media (max-width:760px)", "@media (max-width:430px)", "@media (max-width:360px)", "@media (min-width:1440px)"]:
     assert breakpoint in css, f"Missing responsive breakpoint: {breakpoint}"
-for token in ["min-width:320px", "max-width:1320px", "prefers-reduced-motion"]:
+for token in ["max-width:1320px", "prefers-reduced-motion", "overflow-x:hidden"]:
     assert token in css, f"Missing responsive/accessibility token: {token}"
+
+# Validate the mobile-first content contract without requiring a misleading min-width rule.
+# The layout must remain shrinkable at small viewports and explicitly suppress accidental horizontal overflow.
+assert "main{flex:1;min-width:0" in css, "Main content is not shrink-safe"
+assert "grid-template-columns:1fr" in css, "Mobile single-column layout is missing"
 
 print("Static QA PASS")
