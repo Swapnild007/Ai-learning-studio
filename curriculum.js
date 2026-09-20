@@ -86,87 +86,135 @@ const STAGE_DETAIL = {
 function buildLessons(){
   const stages=["Foundation","Derivation","Implementation","Engineering","Experiment","Research"];
   const lessons=[], base=[];
-  const authoredLessons = {
-    L001: {
-      lessonBody: "If you are completely new to Linear Algebra, start with one simple idea: machine learning works with numbers, and Linear Algebra gives us a clean way to organize and transform those numbers. A single person, image, sentence or transaction can be represented as numbers. A vector is one ordered list of those numbers. A matrix is a collection of such numbers arranged in rows and columns. When you understand what the numbers represent and how their shapes fit together, many ML equations stop looking mysterious.",
-      whyItMatters: "You will see vectors and matrices everywhere in AI: model weights, datasets, embeddings, images, neural-network layers and gradients. You do not need to memorize advanced mathematics first. Your first goal is to become comfortable reading the objects, their shapes and the operation being performed.",
-      mentalModel: [
-        "Scalar = one number, such as 5.",
-        "Vector = an ordered list of numbers, such as [2, 3, 4]. Think of it as one row of measurements or one point described by several features.",
-        "Matrix = numbers arranged in rows and columns. Think of a spreadsheet: rows can represent examples and columns can represent features.",
-        "Shape = the size of the object. A vector [2,3,4] has 3 values. A matrix with 3 rows and 2 columns has shape (3,2).",
-        "Operation = an instruction that transforms numbers. Matrix multiplication is a structured operation, not simply multiplying every number by another number."
-      ],
-      vocabulary: [
-        "Scalar: a single number.",
-        "Vector: an ordered one-dimensional collection of numbers.",
-        "Dimension: how many values are inside a vector.",
-        "Matrix: a rectangular grid of numbers.",
-        "Row: numbers running horizontally across a matrix.",
-        "Column: numbers running vertically down a matrix.",
-        "Transpose: swap rows and columns.",
-        "Dot product: multiply corresponding vector values and add the results."
-      ],
-      workedExample: {
-        title: "Worked example: understanding a vector",
-        text: "Imagine a student is described by three measurements: study hours = 2, practice tests = 3, and projects completed = 4. We can represent that student as x = [2, 3, 4]. The vector is not just three random numbers. Each position has a meaning. This idea is critical in ML because changing the order of features changes what the model receives.",
-        steps: [
-          "Position 1 represents study hours.",
-          "Position 2 represents practice tests.",
-          "Position 3 represents projects completed.",
-          "The vector therefore has dimension 3 and shape (3,).",
-          "If another vector stores weights for these three features, it must also contain three compatible values."
-        ]
-      },
-      secondExample: {
-        title: "Worked example: the dot product",
-        text: "Suppose x = [2, 3] and weights w = [0.5, 2]. Multiply matching positions: 2×0.5 = 1 and 3×2 = 6. Then add them: 1 + 6 = 7. The dot product is therefore 7. In a simple linear model, this calculation is one of the building blocks used to produce a prediction.",
-        steps: [
-          "Match the first feature with the first weight.",
-          "Match the second feature with the second weight.",
-          "Multiply each matching pair.",
-          "Add the products.",
-          "Check that both vectors have the same dimension before calculating."
-        ]
-      },
-      practice: [
-        "Write a vector representing a person with age, height and weekly study hours. Give each position a clear meaning.",
-        "For x=[1,2,4] and w=[3,-1,0.5], calculate the dot product by hand.",
-        "For a matrix with 3 rows and 4 columns, write its shape as (3,4).",
-        "For A with shape (3,4) and x with shape (4,), predict the shape of Ax before calculating it.",
-        "Explain in your own words why a vector with 3 values cannot be directly used where 4 values are required."
-      ],
-      beginnerWarnings: [
-        "Do not try to memorize every formula on the first reading. First understand what each object represents.",
-        "Do not confuse the number of rows with the number of columns.",
-        "Do not assume every multiplication symbol means matrix multiplication.",
-        "Always ask: What does this number represent? What is its shape? What operation are we performing?",
-        "When code gives a shape error, return to the mathematics instead of changing dimensions randomly until the error disappears."
-      ],
-      lab: {
-        title: "Beginner lab: build your first matrix-vector multiplication",
-        objective: "Turn the mathematical idea into a tiny Python implementation without hiding the important steps behind a library.",
-        steps: [
-          "Create a 2×3 matrix A and a length-3 vector x.",
-          "Take the first row of A and calculate its dot product with x.",
-          "Repeat the same process for the second row.",
-          "Store the two results in a new vector.",
-          "Compare your result with NumPy.",
-          "Change x to a length-2 vector and observe the failure. Explain why the operation is mathematically invalid."
-        ],
-        success: "You can explain the calculation without looking at the code, the implementation agrees with a reference implementation, and you can explain the shape error rather than simply fixing it by trial and error."
-      },
-      misconceptions: [
-        "A vector is not merely a bag of numbers. Position and meaning matter.",
-        "A matrix is not automatically a dataset. It can also represent a transformation or parameters.",
-        "Matrix multiplication and elementwise multiplication answer different mathematical questions.",
-        "A program running without an error does not prove that the mathematical operation is correct.",
-        "Advanced notation becomes easier after the underlying objects are familiar."
-      ],
-      takeaway: "Your first Linear Algebra skill is not calculation speed. It is the habit of identifying the object, its meaning, its shape and the operation being performed. That habit will later help you understand regression, neural networks, embeddings, attention and gradient calculations.",
-      lessonBodyExtra: "When you reach a formula such as y = Wx + b later in the course, do not treat it as a new language. Read it as a sequence of familiar objects: W is a matrix, x is a vector, Wx is a matrix-vector operation, b is another vector, and y is the resulting output. The goal of this lesson is to make that reading feel natural."
+  const M1_TEACHING = {
+    "Linear Algebra": {
+      why: "Linear Algebra gives AI a language for representing many numbers at once. Images, datasets, embeddings, model weights and gradients all become easier to reason about when you can identify the object, its shape and the operation being performed.",
+      start: "Think of a spreadsheet. One number is a scalar, a list of related numbers is a vector, and a rectangular table is a matrix. Machine learning repeatedly transforms these objects. The goal is not to memorize symbols first; it is to understand what each object means and why an operation is valid.",
+      vocabulary: ["Scalar = one number.", "Vector = an ordered list of numbers.", "Dimension = the number of values in a vector.", "Matrix = a rectangular grid of numbers.", "Shape = the size of an object, such as (3,4).", "Transpose = swap rows and columns.", "Dot product = multiply matching values and add them.", "Linear map = a transformation that respects addition and scalar multiplication."],
+      mental: ["A vector can represent one example, one embedding or one parameter set.", "A matrix can represent many examples or a transformation.", "Shape is a mathematical contract, not just a programming detail.", "Matrix multiplication combines weighted sums and therefore appears naturally in linear models and neural-network layers.", "Eigenvectors describe directions that a transformation preserves up to scaling; decompositions expose useful structure in a matrix."],
+      example: ["A student described by [study hours, practice tests, projects] becomes x=[2,3,4]. Each position has meaning.", "For x=[2,3] and w=[0.5,2], x·w=2(0.5)+3(2)=7. This is a simple weighted combination and a building block of prediction."],
+      practice: ["Predict the shape before calculating.", "Compute a dot product by hand.", "Explain why incompatible dimensions make an operation invalid.", "Write a small test for a wrong shape.", "Explain the difference between elementwise and matrix multiplication."],
+      warnings: ["Do not confuse rows and columns.", "Do not assume broadcasting proves the mathematics is correct.", "Do not memorize matrix notation without asking what every symbol represents.", "Use numerical tolerance for floating-point comparisons."],
+      lab: "Build dot(), matvec() and transpose() from scratch, add shape checks, compare against NumPy and deliberately test invalid shapes.",
+      misconceptions: ["A vector is not an unordered bag of values.", "A matrix is not necessarily a dataset.", "Matrix multiplication is not elementwise multiplication.", "A successful program execution does not prove mathematical correctness.", "Advanced notation becomes easier after the objects are familiar."],
+      takeaway: "Before touching a formula, identify the object, its meaning, its shape and the operation. This habit becomes a debugging tool for regression, neural networks, attention and gradients.",
+      stages: {
+        Foundation: ["Identify scalars, vectors and matrices from examples.", "Predict shapes without calculating.", "Explain a dot product in plain language."],
+        Derivation: ["Derive matrix-vector multiplication from indexed scalar sums.", "Connect Xw to repeated dot products.", "Explain why dimensions must align."],
+        Implementation: ["Implement dot, matvec and transpose.", "Compare with NumPy using randomized tests.", "Use allclose and explicit shape assertions."],
+        Engineering: ["Debug transpose, shape and broadcasting errors.", "Instrument intermediate shapes.", "Write a root-cause report instead of patching the final exception."],
+        Experiment: ["Study conditioning and numerical tolerance.", "Vary matrix correlation or scale.", "Record error, condition number and interpretation."],
+        Research: ["Test a falsifiable hypothesis about scaling or conditioning.", "Use multiple seeds and controlled variables.", "Report limitations and negative results."]
+      }
+    },
+    "Probability & Statistics": {
+      why: "Probability and statistics teach you how AI handles uncertainty. A model does not live in a world of perfect measurements: data is sampled, labels can be noisy, and evaluation results vary from run to run.",
+      start: "Start with a simple distinction: probability describes uncertainty before or within a model of a process; statistics uses observed data to learn about that process. You will repeatedly move between theoretical quantities and measurements from samples.",
+      vocabulary: ["Random variable = a numerical quantity whose value depends on chance.", "Distribution = a description of how probability is assigned to possible values.", "Expectation = probability-weighted average.", "Variance = average squared deviation from the mean.", "Sample = observed data used to estimate a population property.", "Estimator = a rule that turns data into an estimate.", "Confidence interval = an interval procedure with stated long-run coverage properties.", "Conditional probability = probability after restricting attention to another event."],
+      mental: ["A sample is not the population.", "Repeated experiments reveal sampling variability.", "A point estimate without uncertainty can be misleading.", "Conditioning changes the reference population.", "Evaluation methodology determines what statistical question your metric actually answers."],
+      example: ["A coin with probability p=0.3 of heads has expected outcome 0.3 if heads=1 and tails=0.", "If ten observations have a sample mean of 7, that does not mean every future sample will have mean 7. Repeated samples reveal the distribution of the estimator."],
+      practice: ["Compute a Bernoulli mean and variance.", "Explain P(A|B) in plain language.", "Simulate samples and compare empirical and theoretical means.", "Explain why sample size changes uncertainty.", "Identify a leakage path in an evaluation split."],
+      warnings: ["Do not confuse P(A|B) with P(B|A).", "Do not treat one sample statistic as a population truth.", "Do not cherry-pick seeds.", "Do not interpret a confidence interval as a probability statement about a fixed parameter after the interval is observed."],
+      lab: "Implement mean, sample variance and a simple confidence-interval procedure, then run repeated trials and measure empirical coverage.",
+      misconceptions: ["Random does not mean patternless.", "A larger sample reduces uncertainty but does not remove bias automatically.", "Statistical significance is not the same as practical importance.", "A metric can be precise while answering the wrong question."],
+      takeaway: "Whenever you see a model score, ask how the data was sampled, what uncertainty remains, and what population the result is supposed to represent.",
+      stages: {
+        Foundation: ["Understand random variables and distributions.", "Compute expectation and variance.", "Simulate repeated samples."],
+        Derivation: ["Derive Bernoulli expectation and variance.", "Derive sampling-error intuition.", "Explain conditional probability and Bayes' rule."],
+        Implementation: ["Implement statistics without hiding the calculation.", "Build a repeated-sampling harness.", "Compare empirical and theoretical values."],
+        Engineering: ["Find leakage in a train/test pipeline.", "Separate population, sample and evaluation units.", "Document an invalid comparison and fix it."],
+        Experiment: ["Compare two model variants across fixed seeds.", "Preserve every run.", "Report variability and uncertainty rather than one score."],
+        Research: ["Formulate a falsifiable reliability hypothesis.", "Define primary and secondary outcomes.", "Document ambiguous or negative evidence."]
+      }
+    },
+    "Calculus & Optimization": {
+      why: "Calculus explains how a small change in an input changes an output. Optimization turns that idea into a practical training mechanism: use information about the slope of a loss to decide how parameters should move.",
+      start: "Imagine standing on a hill and wanting to reach the lowest point. The local slope tells you which direction is uphill. Gradient descent uses the same idea in many dimensions: estimate the direction in which the objective increases, then move the parameters the other way.",
+      vocabulary: ["Derivative = local rate of change.", "Partial derivative = rate of change with respect to one variable while holding others fixed.", "Gradient = vector of partial derivatives.", "Jacobian = matrix of derivatives for a vector-valued function.", "Hessian = matrix of second derivatives.", "Learning rate = step size used by an optimizer.", "Convex = a function with a useful global structure for optimization.", "Conditioning = sensitivity of a problem to small perturbations."],
+      mental: ["The gradient points toward increasing function value.", "For minimization, gradient descent moves opposite the gradient.", "The learning rate controls how far each update moves.", "Curvature affects stability and convergence.", "Gradient checking compares an analytical derivative against an independent numerical approximation."],
+      example: ["For f(w)=0.5(w-3)^2, the derivative is w-3. If w=1, the derivative is -2, so moving opposite the gradient means increasing w toward 3.", "For a regression loss, the gradient combines prediction error with the structure of the input matrix."],
+      practice: ["Differentiate a simple quadratic.", "Predict the sign of a derivative.", "Run gradient descent with three learning rates.", "Use finite differences to check a gradient.", "Explain why feature scale can change optimization behavior."],
+      warnings: ["A bigger learning rate is not always faster.", "A decreasing loss does not prove the implementation is correct.", "Finite differences have numerical error too.", "Always inspect gradients, loss and parameter scale together."],
+      lab: "Implement a scalar gradient descent loop, extend it to linear regression, then compare analytical and finite-difference gradients.",
+      misconceptions: ["A derivative is not the same as the function value.", "The gradient is not a single scalar.", "Optimization is not just trial-and-error learning-rate tuning.", "A local improvement does not automatically imply a globally optimal solution."],
+      takeaway: "The central habit is to connect a mathematical derivative to an observable parameter update and then verify the implementation independently.",
+      stages: {
+        Foundation: ["Interpret derivatives as local change.", "Understand gradients geometrically.", "Run a tiny optimization example."],
+        Derivation: ["Derive gradient descent for a quadratic.", "Derive the gradient of MSE.", "Explain the role of the transpose."],
+        Implementation: ["Implement finite differences and analytical gradients.", "Build linear regression training from scratch.", "Add gradient checks."],
+        Engineering: ["Diagnose exploding or stalled training.", "Inspect gradient norm and loss curves.", "Separate data-scale bugs from learning-rate bugs."],
+        Experiment: ["Map stable and unstable learning-rate ranges.", "Compare raw and standardized features.", "Report convergence and failure modes."],
+        Research: ["Test whether normalization increases optimization robustness.", "Use a predefined learning-rate grid and multiple seeds.", "Report what the experiment cannot establish."]
+      }
+    },
+    "Algorithms & Data Structures": {
+      why: "AI is not only mathematics. Data must be stored, searched, transformed and moved efficiently. Algorithms and data structures determine whether a correct idea remains practical when the dataset becomes large.",
+      start: "Think about looking for a name in an unsorted pile of papers versus a sorted index. Both contain the same information, but the organization changes the amount of work required. Algorithms formalize the steps; data structures organize the information those steps operate on.",
+      vocabulary: ["Algorithm = a defined procedure for solving a problem.", "Data structure = a way to organize data for particular operations.", "Big-O = asymptotic description of scaling.", "Invariant = a condition that remains true during an algorithm.", "Hash table = key-based structure supporting fast average lookup.", "Heap = structure for maintaining extreme elements efficiently.", "Graph = nodes connected by edges.", "Recursion = solving a problem through smaller instances of itself."],
+      mental: ["Correctness comes before optimization.", "Complexity describes scaling, not one stopwatch measurement.", "An invariant is often the key to understanding an algorithm.", "The right data structure can change an algorithm's practical behavior dramatically.", "Benchmarks must use realistic workloads."],
+      example: ["Searching an unsorted list may require checking every item. Binary search can repeatedly halve the search region, but only when the data is ordered.", "A hash map turns repeated key lookup into a different computational pattern than scanning a list."],
+      practice: ["Trace binary search by hand.", "Write a loop invariant.", "Calculate complexity of nested loops.", "Implement a frequency counter.", "Compare top-k approaches for different k."],
+      warnings: ["Big-O is not a complete performance model.", "Do not optimize code before measuring the bottleneck.", "A faster algorithm that produces wrong results is not an optimization.", "Memory complexity matters too."],
+      lab: "Implement binary search, frequency indexing and bounded top-k retrieval, then benchmark correctness, latency and memory as input size changes.",
+      misconceptions: ["O(n) does not mean every O(n) program has the same runtime.", "Hash lookup is not literally guaranteed constant time in every circumstance.", "Recursion is a technique, not automatically a faster solution.", "Benchmark results depend on workload and environment."],
+      takeaway: "Learn to connect a data representation to the operations you need, then derive and measure the resulting cost.",
+      stages: {
+        Foundation: ["Understand algorithms and data structures.", "Trace simple searches.", "Read basic complexity notation."],
+        Derivation: ["Derive complexity from loop counts.", "Use invariants to reason about correctness.", "Analyze matrix and retrieval workloads."],
+        Implementation: ["Implement binary search, hashing and top-k.", "Write adversarial tests.", "Compare against trusted references."],
+        Engineering: ["Profile a slow retrieval routine.", "Find the actual bottleneck.", "Replace it without changing behavior."],
+        Experiment: ["Benchmark scaling across input sizes.", "Measure p50/p95 latency and memory.", "Use realistic workload distributions."],
+        Research: ["Study a speed-quality-memory trade-off.", "Define a quality constraint before measuring.", "Report the feasible operating region."]
+      }
+    },
+    "Systems Foundations": {
+      why: "A model ultimately runs on a computer. CPU, memory, storage, networking, processes and concurrency determine whether an AI workload is fast, slow, stable or impossible to run.",
+      start: "Think of an AI program as a worker using limited resources. It needs memory to hold data, compute to process it, storage to read it and networking to move information. Systems thinking means measuring those resources instead of guessing.",
+      vocabulary: ["Process = a running program with its own resources.", "Thread = execution path within a process.", "Memory = working storage used by programs.", "I/O = input/output such as disk and network activity.", "Concurrency = multiple activities making progress during overlapping periods.", "Throughput = amount of work completed per unit time.", "Latency = time taken by one operation or request.", "Backpressure = slowing a producer when downstream capacity is limited."],
+      mental: ["Every workload has resource constraints.", "The slowest stage can limit pipeline throughput.", "Queues decouple stages but consume memory.", "More concurrency can improve throughput until another resource becomes the bottleneck.", "Telemetry turns vague performance complaints into testable hypotheses."],
+      example: ["If data loading takes 100 ms and computation takes 20 ms, adding compute workers may not help if the loader remains the bottleneck.", "A batch of larger tensors may improve throughput but increase memory and latency."],
+      practice: ["Estimate tensor memory from shape and dtype.", "Calculate simple throughput.", "Identify a likely bottleneck from stage timings.", "Explain backpressure.", "Compare batch-size trade-offs."],
+      warnings: ["An out-of-memory error is a resource failure, not automatically a model failure.", "CPU utilization alone does not explain every bottleneck.", "More workers can make performance worse.", "Average latency can hide tail latency."],
+      lab: "Build a bounded producer-consumer pipeline, instrument stage time and queue depth, then vary batch size and worker count.",
+      misconceptions: ["A process and a thread are not the same thing.", "High CPU usage does not automatically mean the system is efficient.", "More parallelism is not always better.", "Throughput and latency are related but different measurements."],
+      takeaway: "Systems literacy starts with resource accounting: what is consuming memory, what is waiting, what is executing, and what measurement would distinguish competing explanations?",
+      stages: {
+        Foundation: ["Understand processes, memory, I/O and concurrency.", "Estimate simple resource requirements.", "Read basic system measurements."],
+        Derivation: ["Derive memory and throughput estimates.", "Reason about pipeline bottlenecks.", "Explain queueing and backpressure."],
+        Implementation: ["Build a bounded producer-consumer pipeline.", "Add instrumentation.", "Handle clean startup and shutdown."],
+        Engineering: ["Diagnose CPU, memory and I/O bottlenecks.", "Use telemetry to identify the limiting stage.", "Document root cause and verified fix."],
+        Experiment: ["Measure batch and worker trade-offs.", "Record throughput, p95 latency and memory.", "Identify a feasible operating region."],
+        Research: ["Test a bottleneck hypothesis.", "Instrument competing explanations.", "Report causal evidence, limitations and next experiments."]
+      }
     }
   };
+
+  const authoredLessons = {};
+  let authoredId = 1;
+  for (const unit of Object.keys(M1_TEACHING)) {
+    const profile = M1_TEACHING[unit];
+    for (const stage of ["Foundation","Derivation","Implementation","Engineering","Experiment","Research"]) {
+      const stageInfo = STAGE_DETAIL[stage];
+      const steps = profile.stages[stage];
+      authoredLessons["L"+String(authoredId).padStart(3,"0")] = {
+        whyItMatters: profile.why,
+        lessonBody: profile.start,
+        mentalModel: profile.mental,
+        vocabulary: profile.vocabulary,
+        workedExample: { title: "Worked example", text: profile.example[0], steps: ["Identify what each number represents.", "Write the object and its shape.", "Apply the operation one step at a time.", "Check whether the result makes sense."] },
+        secondExample: { title: "Second example", text: profile.example[1], steps: ["State the inputs.", "Perform the calculation or reasoning.", "Check dimensions or assumptions.", "Explain what the result means in an ML context."] },
+        practice: profile.practice,
+        beginnerWarnings: profile.warnings,
+        lab: { title: stage+" lab", objective: stageInfo.verb+" "+unit+".", steps, success: profile.lab },
+        misconceptions: profile.misconceptions,
+        takeaway: profile.takeaway,
+        lessonBodyExtra: "This stage is deliberately connected to the next one. You are not expected to know everything immediately. First understand the idea, then derive it, then implement it, then learn to debug it, measure it and finally investigate it.",
+        stageSteps: steps
+      };
+      authoredId++;
+    }
+  }
+
 
   let n=1;
   for(const module of CURRICULUM.modules){
