@@ -157,6 +157,10 @@ function moduleCard(module) {
         <p>${escapeHtml(module.desc)}</p>
       </div>
 
+      <div class="module-card-meta">
+        <span class="lesson-count">${moduleLessons(module.id).length} lessons</span>
+      </div>
+
       <div>
         <div class="pill-row">
           ${module.tags
