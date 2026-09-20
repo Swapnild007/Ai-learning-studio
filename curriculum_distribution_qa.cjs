@@ -31,9 +31,24 @@ for (const lesson of lessons) {
   ids.add(lesson.id);
 }
 
+let cumulative = 0;
 for (const module of curriculum.modules) {
-  const runtimeCount = lessons.filter((lesson) => lesson.module === module.id).length;
+  const moduleLessons = lessons.filter((lesson) => lesson.module === module.id);
+  const runtimeCount = moduleLessons.length;
   const authoredStageCount = module.units.length * 6;
+
+  if (moduleLessons.length && moduleLessons[0].id !== "L" + String(cumulative + 1).padStart(3, "0")) {
+    throw new Error("Module " + module.id + " must start at contiguous lesson ID L" + String(cumulative + 1).padStart(3, "0") + "; got " + moduleLessons[0].id);
+  }
+  if (moduleLessons.length && moduleLessons[moduleLessons.length - 1].id !== "L" + String(cumulative + runtimeCount).padStart(3, "0")) {
+    throw new Error("Module " + module.id + " must end at contiguous lesson ID L" + String(cumulative + runtimeCount).padStart(3, "0") + "; got " + moduleLessons[moduleLessons.length - 1].id);
+  }
+  moduleLessons.forEach((lesson, index) => {
+    const expectedId = "L" + String(cumulative + index + 1).padStart(3, "0");
+    if (lesson.id !== expectedId || lesson.order !== cumulative + index + 1) {
+      throw new Error("Module " + module.id + " has non-contiguous lesson numbering at " + lesson.id);
+    }
+  });
 
   if (authoredStageCount !== 30) {
     throw new Error(
@@ -47,6 +62,8 @@ for (const module of curriculum.modules) {
       " runtime lessons; got " + runtimeCount
     );
   }
+
+  cumulative += runtimeCount;
 }
 
 const total = Object.values(expected).reduce((a, b) => a + b, 0);
