@@ -195,6 +195,48 @@
     }
   };
 
+  const stageMath = {
+    "Regression & Classification":{
+      Foundation:"Define y_hat=f_w(x), residual r=y-y_hat, and for binary classification p(y=1|x)=sigma(z), sigma(z)=1/(1+e^-z). Distinguish prediction, score and probability.",
+      Derivation:"For linear least squares J(w)=1/2n ||Xw-y||^2, derive ∇J=(1/n)Xᵀ(Xw-y). For logistic regression with p=sigma(Xw), derive ∇J=(1/n)Xᵀ(p-y). L2 adds lambda||w||²/2.",
+      Implementation:"Map each equation to code: matrix multiply to scores, sigmoid to probabilities, gradient to updates, and mean log-loss to the objective. Verify gradient values with finite differences on a tiny dataset.",
+      Engineering:"Check numerical invariants: probabilities stay in [0,1], loss is finite, shapes agree, and extreme logits do not overflow. Separate optimization failure from data leakage or label problems.",
+      Experiment:"Treat regularization strength as the independent variable. Keep the data split, optimizer, metric and seed protocol fixed; record train and holdout error plus coefficient norm.",
+      Research:"Pre-register the question, comparison values, primary metric and falsification condition. A regularization effect that disappears across repeated controlled datasets weakens the hypothesis."
+    },
+    "Trees & Ensembles":{
+      Foundation:"For class proportions p_k in a node, Gini=1-Σp_k² and entropy=-Σp_k log₂p_k. A pure node has impurity 0 under both criteria.",
+      Derivation:"For split S into children j, weighted impurity is Σ_j (n_j/n)I_j. Split gain is I_parent minus this weighted value. The weighting prevents tiny children from dominating the criterion.",
+      Implementation:"Translate the split equations into a threshold-search loop. Test pure, mixed, empty-child and tied-gain cases, then compare the selected threshold with a trusted tree implementation.",
+      Engineering:"Use depth, leaf size and feature-importance stability as diagnostics. Reproduce overfitting before changing the model, then lock the fix with a test.",
+      Experiment:"Vary one complexity parameter at a time, then study interactions such as boosting learning rate versus stage count. Preserve every repeat rather than reporting a single run.",
+      Research:"Operationalize ensemble variance before the experiment. Compare decorrelated versus correlated base learners under matched bootstrap samples and report where the variance effect does not hold."
+    },
+    "Unsupervised Learning":{
+      Foundation:"K-means minimizes Σ_i ||x_i-c_{z_i}||². PCA seeks orthogonal directions maximizing projected variance, equivalently the leading eigenvectors of the centered covariance matrix.",
+      Derivation:"K-means alternates assignment z_i=argmin_k||x_i-c_k||² and centroid c_k=mean{x_i:z_i=k}. For PCA, maximize vᵀΣv subject to ||v||=1, giving Σv=λv.",
+      Implementation:"Keep assignment, update and stopping conditions explicit. For PCA, center first and verify that reconstruction error decreases as more components are retained.",
+      Engineering:"Protect against empty clusters, poor initialization, scale domination and numerical singularities. Diagnose whether a change comes from the data geometry or the algorithm.",
+      Experiment:"Hold the dataset and initialization protocol fixed while varying cluster count, scaling or dimensionality. Report inertia, stability or reconstruction error with repeated runs.",
+      Research:"Define both the structural metric and downstream usefulness before running the study. A stable cluster solution can still fail to improve a downstream task."
+    },
+    "Evaluation & Validation":{
+      Foundation:"From TP, FP, FN and TN define precision=TP/(TP+FP), recall=TP/(TP+FN), and F1=2PR/(P+R). Define train, validation and test roles before fitting.",
+      Derivation:"Cross-validation estimates held-out performance by averaging fold scores. Bootstrap resamples observed rows with replacement to approximate sampling variability. Neither removes bias caused by leakage or repeated test tuning.",
+      Implementation:"Put every learned preprocessing step inside the fold-specific training pipeline. Verify metric calculations against a trusted reference and test split disjointness.",
+      Engineering:"Treat data boundaries as contracts. Detect duplicate rows across splits, target-derived features, accidental test-set tuning and preprocessing fitted before cross-validation.",
+      Experiment:"Compare evaluation protocols using repeated datasets and fixed model procedures. Record mean and dispersion, and check whether model ordering is stable under the chosen metric.",
+      Research:"Ask whether protocol choice changes the conclusion. Predefine the ranking rule and uncertainty summary, then report both stable and unstable orderings."
+    },
+    "ML Engineering Patterns":{
+      Foundation:"A baseline establishes reference risk R_base. Candidate improvement is meaningful only relative to the same data split, target definition and metric. Residual r_i=y_i-yhat_i exposes structure hidden by aggregate error.",
+      Derivation:"For squared error MSE=n^-1Σ(y_i-yhat_i)². A model-selection comparison is an estimator with variability, not a single deterministic truth. Pipeline fit scope determines whether validation data influences learned preprocessing.",
+      Implementation:"Encode baseline, preprocessing, model, cross-validation and metrics as one reproducible pipeline. Keep configuration and random-state choices explicit and compare outputs to an independent calculation.",
+      Engineering:"Debug schema drift, hidden state and metric regressions by tracing data and configuration through each stage. A regression test should fail before the fix and pass after it.",
+      Experiment:"Define a baseline-first protocol and compare candidate models under identical folds. Add slice analysis and seed sensitivity as secondary diagnostics rather than changing the primary metric after seeing results.",
+      Research:"Test whether aggregate metrics hide subgroup failures using predefined slices. Report the slice definition, sample counts, aggregate result and subgroup result without cherry-picking."
+    }
+  };
   const answers = {
     Foundation:["The invariant is that the learning problem, data roles and model assumptions are explicit before fitting.","The explanation is challenged when a valid example violates predicted behavior or a required assumption is absent.","A convincing result is reproducible from the same inputs and protocol and can be explained mechanistically."],
     Derivation:["Each mathematical step must preserve the meaning of the original objective or probability statement.","A dimension mismatch, unjustified algebraic step or numerical contradiction is evidence of an error.","Independent numerical verification on a small case checks the symbolic result."],
@@ -223,8 +265,8 @@
       l.lessonBodyExtra="Research alignment: the lesson combines statistical reasoning, algorithmic implementation, formal assumptions and empirical evaluation, following the theory → implementation → experiment progression found across the selected university curricula.";
       l.mentalModel=p.mental;
       l.vocabulary=p.vocab;
-      l.math=p.math;
-      l.mechanism="Trace data and assumptions → hypothesis class → objective or estimator → fitted model → prediction → evaluation.";
+      l.math=stageMath[unit][stage];
+      l.mechanism=stage==="Foundation" ? "Trace the observable behavior back to the model objects and assumptions." : stage==="Derivation" ? "Trace each mathematical transformation from definition to computable quantity." : stage==="Implementation" ? "Trace equation → data structure → operation → test → reference comparison." : stage==="Engineering" ? "Trace symptom → violated contract/invariant → diagnostic measurement → root cause → regression test." : stage==="Experiment" ? "Trace hypothesis → controlled variable → baseline → repeated measurement → interpretation." : "Trace research question → falsification condition → protocol → evidence → limitation.";
       l.implementation=p.implementation;
       l.experiment=p.experiment;
       l.failure=p.failure;
