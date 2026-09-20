@@ -269,6 +269,15 @@ function bindModule02Interaction() {
   if (window.Module02Labs) window.Module02Labs.bind();
 }
 
+function module03Interaction(lesson) {
+  if (lesson.module !== "m3" || !window.Module03Labs) return "";
+  return window.Module03Labs.render(lesson);
+}
+
+function bindModule03Interaction() {
+  if (window.Module03Labs) window.Module03Labs.bind();
+}
+
 function openLesson(lessonId) {
   const lesson = LESSONS.find((item) => item.id === lessonId);
 
@@ -300,6 +309,7 @@ function openLesson(lessonId) {
           ${dossierSection("Mechanism", lesson.mechanism)}
           ${lesson.workedExample ? dossierSection(lesson.workedExample.title, lesson.workedExample.text + " " + lesson.workedExample.steps.join(" ")) : ""}
           ${lesson.secondExample ? dossierSection(lesson.secondExample.title, lesson.secondExample.text + " " + lesson.secondExample.steps.join(" ")) : ""}\n          ${module02Interaction(lesson)}
+          ${module03Interaction(lesson)}
 
           <section class="dossier-section">
             <h3>Implementation</h3>
@@ -356,6 +366,7 @@ function openLesson(lessonId) {
   `;
 
   bindModule02Interaction();
+  bindModule03Interaction();
 
   $("#completeBtn")?.addEventListener("click", () => {
     if (state.completed.has(lessonId)) {
