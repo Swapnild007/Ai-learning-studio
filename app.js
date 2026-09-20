@@ -339,12 +339,8 @@ function openLesson(lessonId) {
 function dossierListSection(title, items, ordered = false) {
   if (!Array.isArray(items) || !items.length) return "";
   const tag = ordered ? "ol" : "ul";
-  return `
-    <section class="dossier-section">
-      <h3>${escapeHtml(title)}</h3>
-      <${tag}>${items.map((item) => \`<li>${escapeHtml(item)}</li>\`).join("")}</${tag}>
-    </section>
-  `;
+  const list = items.map((item) => "<li>" + escapeHtml(item) + "</li>").join("");
+  return "<section class=\"dossier-section\"><h3>" + escapeHtml(title) + "</h3><" + tag + ">" + list + "</" + tag + "></section>";
 }
 
 function dossierSection(title, content) {
