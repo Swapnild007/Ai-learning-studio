@@ -895,13 +895,37 @@ function bindGlobalEvents() {
   });
 }
 
-function initialize() {
-  bindGlobalEvents();
-  home();
-  requestAnimationFrame(() => syncActiveNavigation(state.view));
-  window.addEventListener("resize", () => {
-    syncActiveNavigation(state.view);
-  });
+function renderBootFailure(error) {
+  const main = $("#main");
+  if (!main) return;
+  const message = error instanceof Error ? error.message : String(error);
+  main.innerHTML = `
+    <section class="card" style="max-width:760px;margin:40px auto;padding:28px">
+      <div class="kicker">STARTUP DIAGNOSTIC</div>
+      <h1 style="margin:8px 0">Learning workspace could not start</h1>
+      <p style="color:var(--muted);line-height:1.6">The page loaded, but one runtime component failed during startup. Refresh once; if the problem persists, the diagnostic below identifies the failing path.</p>
+      <pre class="code" style="white-space:pre-wrap">${escapeHtml(message)}</pre>
+      <button class="action" id="retryBoot">Retry workspace</button>
+    </section>
+  `;
+  $("#retryBoot")?.addEventListener("click", () => window.location.reload());
 }
 
-initialize();
+function initialize() {
+  try {
+    bindGlobalEvents();
+    home();
+    requestAnimationFrame(() => syncActiveNavigation(state.view));
+    window.addEventListener("resize", () => syncActiveNavigation(state.view));
+    document.documentElement.dataset.appReady = "true";
+  } catch (error) {
+    console.error("AI Learning Studio startup failure", error);
+    renderBootFailure(error);
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initialize, { once: true });
+} else {
+  initialize();
+}
