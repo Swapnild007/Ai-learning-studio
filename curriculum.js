@@ -546,52 +546,40 @@ function buildLessons(){
    * distributed across Modules 02-06 so generated practice records retain
    * their source module identity.
    */
-  // Distribute the 520-lesson capacity across Modules 02-06 instead of
-  // assigning every generated practice record to the first expandable module.
-  // Module 01 remains frozen at 30 authored lessons. The remaining 490
-  // capacity is balanced at 98 lessons per module across Modules 02-06.
-  const expandableModules=CURRICULUM.modules.filter((module)=>module.id!=="m1");
-  const targetPerModule=Math.floor((CURRICULUM.meta.targetLessons-30)/expandableModules.length);
-  const sourceByModule=new Map(expandableModules.map((module)=>[
-    module.id,
-    base.filter((lesson)=>lesson.module===module.id)
-  ]));
-  const generatedByModule=new Map(expandableModules.map((module)=>[module.id,0]));
-  let moduleCursor=0;
-  while(lessons.length<CURRICULUM.meta.targetLessons){
-    const module=expandableModules[moduleCursor%expandableModules.length];
-    const currentTotal=base.filter((lesson)=>lesson.module===module.id).length+generatedByModule.get(module.id);
-    if(currentTotal>=targetPerModule){
-      moduleCursor++;
-      continue;
+  // Deterministic capacity fill: each module has an explicit final target.
+  // This avoids any dependence on cursor state or source-pool size.
+  const targetCounts = { m1: 30, m2: 98, m3: 98, m4: 98, m5: 98, m6: 98 };
+  const expandableModules = CURRICULUM.modules.filter((module) => module.id !== "m1");
+  let nextOrder = lessons.length + 1;
+
+  for (const module of expandableModules) {
+    const pool = base.filter((lesson) => lesson.module === module.id);
+    if (!pool.length) throw new Error("No authored source lessons for " + module.id);
+    let current = lessons.filter((lesson) => lesson.module === module.id).length;
+    let copyIndex = 0;
+    while (current < targetCounts[module.id]) {
+      const source = pool[copyIndex % pool.length];
+      lessons.push({
+        ...source,
+        id: "L" + String(nextOrder).padStart(3, "0"),
+        order: nextOrder,
+        title: source.title + " · Practice " + (Math.floor(copyIndex / pool.length) + 1),
+        evidence: "Transfer the same concept to a new dataset, constraint or failure mode.",
+        deliverable: "A transfer artifact with evidence showing what changed and what remained invariant."
+      });
+      current++;
+      copyIndex++;
+      nextOrder++;
     }
-    const pool=sourceByModule.get(module.id);
-    const generatedIndex=generatedByModule.get(module.id);
-    const source=pool[generatedIndex%pool.length];
-    const k=lessons.length+1;
-    lessons.push({
-      ...source,
-      id:"L"+String(k).padStart(3,"0"),
-      order:k,
-      title:source.title+" · Practice "+(Math.floor(generatedIndex/pool.length)+1),
-      evidence:"Transfer the same concept to a new dataset, constraint or failure mode.",
-      deliverable:"A transfer artifact with evidence showing what changed and what remained invariant."
-    });
-    generatedByModule.set(module.id,generatedIndex+1);
-    moduleCursor++;
   }
-  // Hard invariants: the generated curriculum must be exactly 520 lessons,
-  // with Module 01 frozen at 30 and Modules 02-06 balanced at 98 each.
-  const expectedCounts = new Map([
-    ["m1", 30], ["m2", 98], ["m3", 98], ["m4", 98], ["m5", 98], ["m6", 98]
-  ]);
+  // Hard invariants: never ship a partial curriculum.
   if (lessons.length !== CURRICULUM.meta.targetLessons) {
     throw new Error("Curriculum generation invariant failed: expected " + CURRICULUM.meta.targetLessons + " lessons, got " + lessons.length);
   }
-  for (const [moduleId, expected] of expectedCounts) {
-    const actual = lessons.filter((lesson) => lesson.module === moduleId).length;
-    if (actual !== expected) {
-      throw new Error("Curriculum generation invariant failed for " + moduleId + ": expected " + expected + ", got " + actual);
+  for (const module of CURRICULUM.modules) {
+    const actual = lessons.filter((lesson) => lesson.module === module.id).length;
+    if (actual !== targetCounts[module.id]) {
+      throw new Error("Curriculum generation invariant failed for " + module.id + ": expected " + targetCounts[module.id] + ", got " + actual);
     }
   }
   return lessons;
