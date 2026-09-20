@@ -624,7 +624,7 @@ function aiTools() {
       </div>
     `
   );
-  $("[data-tool-id]").forEach((button) => {
+  $$("[data-tool-id]").forEach((button) => {
     button.addEventListener("click", () => {
       const tool = tools.find((item) => item.id === button.dataset.toolId);
       if (!tool) return;
@@ -782,7 +782,7 @@ function closeSearch() {
 }
 
 function updateActiveNavigation(activeButton) {
-  $(".nav-item").forEach((button) => {
+  $$(".nav-item").forEach((button) => {
     button.classList.toggle("active", button === activeButton);
   });
 
@@ -796,7 +796,7 @@ function updateActiveNavigation(activeButton) {
 }
 
 function syncActiveNavigation(view) {
-  const activeButton = $(".nav-item").find(
+  const activeButton = $$(".nav-item").find(
     (button) => button.dataset.view === view
   );
   updateActiveNavigation(activeButton);
@@ -814,7 +814,7 @@ function bindGlobalEvents() {
     menuButton?.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
   };
 
-  $$(".nav-item").forEach((button) => {
+  $$$(".nav-item").forEach((button) => {
     button.addEventListener("click", () => {
       route(button.dataset.view);
       setMenuOpen(false);
