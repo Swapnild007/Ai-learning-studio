@@ -49,6 +49,8 @@ jobs:
           node --check ui_navigation_qa.cjs
           node --check ui-shell.js
           node --check ui_shell_qa.cjs
+          node --check ui-experience.js
+          node --check ui_experience_qa.cjs
 
       - name: Run learning engine tests
         run: node learning-engine.test.js
@@ -76,3 +78,6 @@ jobs:
 
       - name: Run liquid shell QA
         run: node ui_shell_qa.cjs
+
+      - name: Run experience UI QA
+        run: node ui_experience_qa.cjs
