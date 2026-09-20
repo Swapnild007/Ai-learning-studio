@@ -580,6 +580,20 @@ function buildLessons(){
     generatedByModule.set(module.id,generatedIndex+1);
     moduleCursor++;
   }
+  // Hard invariants: the generated curriculum must be exactly 520 lessons,
+  // with Module 01 frozen at 30 and Modules 02-06 balanced at 98 each.
+  const expectedCounts = new Map([
+    ["m1", 30], ["m2", 98], ["m3", 98], ["m4", 98], ["m5", 98], ["m6", 98]
+  ]);
+  if (lessons.length !== CURRICULUM.meta.targetLessons) {
+    throw new Error("Curriculum generation invariant failed: expected " + CURRICULUM.meta.targetLessons + " lessons, got " + lessons.length);
+  }
+  for (const [moduleId, expected] of expectedCounts) {
+    const actual = lessons.filter((lesson) => lesson.module === moduleId).length;
+    if (actual !== expected) {
+      throw new Error("Curriculum generation invariant failed for " + moduleId + ": expected " + expected + ", got " + actual);
+    }
+  }
   return lessons;
 }
 
