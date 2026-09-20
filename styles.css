@@ -121,3 +121,42 @@ main{position:relative}
 @media(prefers-reduced-motion:reduce){.module-tile,.experience-progress .grid .card{animation:none}}
 
 .module-card-meta{display:flex;align-items:center;margin:4px 0 10px}.lesson-count{display:inline-flex;align-items:center;padding:6px 9px;border-radius:99px;background:rgba(237,244,255,.88);border:1px solid rgba(217,231,255,.92);color:#2459ad;font-size:9px;font-weight:800;letter-spacing:.04em}
+
+
+/* Module 03 deep-learning lab layer */
+.m3-lab-slot{margin:20px 0}
+.m3-real-lab{border:1px solid rgba(37,99,235,.12);border-radius:24px;padding:20px;background:linear-gradient(145deg,rgba(255,255,255,.82),rgba(239,246,255,.72));box-shadow:0 18px 45px rgba(37,99,235,.08)}
+.m3-lab-top{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.m3-lab-top h3{margin:5px 0 6px}
+.m3-lab-top p{margin:0;color:var(--muted);line-height:1.55;max-width:650px}
+.m3-lab-control{display:grid;gap:6px;min-width:150px;font-size:12px;color:var(--muted)}
+.m3-lab-control input{accent-color:#2563eb}
+.m3-lab-control output{font-weight:700;color:var(--text)}
+.m3-visual{min-height:92px;margin-top:18px;padding:16px;border-radius:18px;background:rgba(255,255,255,.7);border:1px solid rgba(148,163,184,.18);overflow:hidden}
+.m3-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+.m3-metric{padding:12px 14px;border-radius:15px;background:rgba(255,255,255,.72);border:1px solid rgba(148,163,184,.14)}
+.m3-metric span{display:block;color:var(--muted);font-size:11px}
+.m3-metric strong{display:block;margin-top:4px;font-size:15px}
+.m3-lab-note{margin-top:12px;color:var(--muted);font-size:12px;line-height:1.55}
+.m3-flow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;font-size:14px}
+.m3-flow span,.m3-flow b{padding:10px 13px;border-radius:13px;background:white;border:1px solid rgba(148,163,184,.2)}
+.m3-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;max-width:300px;margin:auto}
+.m3-grid span{aspect-ratio:1;border-radius:5px;background:rgba(148,163,184,.14)}
+.m3-grid span.hot{background:rgba(37,99,235,.3);box-shadow:inset 0 0 0 1px rgba(37,99,235,.18)}
+.m3-bar{height:18px;border-radius:99px;background:rgba(148,163,184,.16);overflow:hidden}
+.m3-bar span{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#60a5fa,#2563eb)}
+.m3-attention{display:grid;gap:8px}
+.m3-att-row{display:grid;grid-template-columns:70px 1fr 55px;gap:9px;align-items:center;font-size:11px}
+.m3-att-row div{height:14px;border-radius:99px;background:rgba(148,163,184,.14);overflow:hidden}
+.m3-att-row i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#93c5fd,#6366f1)}
+.m3-spark{height:100px;display:flex;align-items:flex-end;gap:4px}
+.m3-spark span{flex:1;min-width:3px;border-radius:4px 4px 1px 1px;background:linear-gradient(180deg,#60a5fa,#2563eb)}
+@media(max-width:760px){
+  .m3-real-lab{padding:16px;border-radius:20px}
+  .m3-metrics{grid-template-columns:1fr}
+  .m3-lab-control{min-width:135px}
+  .m3-att-row{grid-template-columns:55px 1fr 48px}
+}
+@media(prefers-reduced-motion:reduce){
+  .m3-real-lab *{scroll-behavior:auto}
+}
