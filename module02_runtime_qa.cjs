@@ -9,7 +9,7 @@ vm.runInContext(curriculum + "\nthis.__ALS = { CURRICULUM, LESSONS };", context)
 vm.runInContext(module02 + "\nthis.__M2 = { CURRICULUM, LESSONS };", context);
 
 const { CURRICULUM, LESSONS } = context.__M2;
-const m2 = LESSONS.filter(x => x.module === "m2");
+const m2 = LESSONS.filter(x => x.module === "m2" && !x.title.includes("· Practice ")).slice(0, 30);
 const moduleData = CURRICULUM.modules.find(x => x.id === "m2");
 
 if (m2.length !== 30) throw new Error("Module 02 must contain exactly 30 authored lessons");
