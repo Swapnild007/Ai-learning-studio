@@ -16,7 +16,7 @@ if (m2.length !== 30) throw new Error("Module 02 must contain exactly 30 authore
 if (new Set(m2.map(x => x.title)).size !== 30) throw new Error("Module 02 lesson titles must be unique");
 if (new Set(m2.map(x => x.unit)).size !== 5) throw new Error("Module 02 must cover five units");
 if (new Set(m2.map(x => x.stage)).size !== 6) throw new Error("Module 02 must cover six stages");
-if (!moduleData.masteryGate || module.masteryGate.criteria.length < 6) throw new Error("Module 02 mastery gate is incomplete");
+if (!moduleData.masteryGate || moduleData.masteryGate.criteria.length < 6) throw new Error("Module 02 mastery gate is incomplete");
 if (!moduleData.researchBasis || moduleData.researchBasis.length < 5) throw new Error("Module 02 research basis is incomplete");
 
 for (const lesson of m2) {
