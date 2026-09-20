@@ -39,7 +39,7 @@ Experiment:u=>["Predeclare a hypothesis and primary metric.","Change one meaning
 Research:u=>["Frame a falsifiable question with a meaningful baseline.","Define what result would disconfirm it and run the protocol.","Report negative results, threats to validity and the next experiment."]
 };
 const kind=["baseline transfer","edge-case transfer","scale transfer","ablation transfer","adversarial transfer","systems transfer","research transfer"];
-for(const l of globalThis.LESSONS||[]){
+for(const l of LESSONS||[]){
  if(l.module==="m1") continue;
  const p=P[l.unit]; if(!p) throw new Error("No depth profile for "+l.unit);
  const st=steps[l.stage](l.unit);
@@ -66,5 +66,5 @@ for(const l of globalThis.LESSONS||[]){
  l.evidence="Evidence must demonstrate the mechanism, controlled implementation or derivation, measured behavior, failure analysis and limitations.";
  l.deliverable="Submit the artifact, tests, baseline comparison, failure analysis and concise technical note.";
 }
-globalThis.__CURRICULUM_DEPTH_AUDIT={profiles:Object.keys(P).length,enriched:globalThis.LESSONS.filter(l=>l.module!=="m1").length};
+globalThis.__CURRICULUM_DEPTH_AUDIT={profiles:Object.keys(P).length,enriched:LESSONS.filter(l=>l.module!=="m1").length};
 })();
