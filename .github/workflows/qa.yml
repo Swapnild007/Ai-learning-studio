@@ -38,6 +38,9 @@ jobs:
           node --check curriculum.js
           node --check curriculum-depth.js
           node --check module02.js
+      node --check module03.js
+      node --check module03-labs.js
+      node --check module03_content_qa.cjs
           node --check module02-labs.js
           node --check module02_labs_qa.cjs
           node --check module02_content_audit.cjs
@@ -73,6 +76,7 @@ jobs:
 
       - name: Run Module 02 content accuracy audit
         run: node module02_content_audit.cjs
+      node module03_content_qa.cjs
 
       - name: Run syntax primer QA
         run: node syntax_primer_qa.js
