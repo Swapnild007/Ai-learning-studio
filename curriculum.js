@@ -546,19 +546,39 @@ function buildLessons(){
    * distributed across Modules 02-06 so generated practice records retain
    * their source module identity.
    */
-  let i=0;
-  const expandableBase=base.filter((lesson)=>lesson.module!=="m1");
+  // Distribute the 520-lesson capacity across Modules 02-06 instead of
+  // assigning every generated practice record to the first expandable module.
+  // Module 01 remains frozen at 30 authored lessons. The remaining 490
+  // capacity is balanced at 98 lessons per module across Modules 02-06.
+  const expandableModules=CURRICULUM.modules.filter((module)=>module.id!=="m1");
+  const targetPerModule=Math.floor((CURRICULUM.meta.targetLessons-30)/expandableModules.length);
+  const sourceByModule=new Map(expandableModules.map((module)=>[
+    module.id,
+    base.filter((lesson)=>lesson.module===module.id)
+  ]));
+  const generatedByModule=new Map(expandableModules.map((module)=>[module.id,0]));
+  let moduleCursor=0;
   while(lessons.length<CURRICULUM.meta.targetLessons){
-    const source=expandableBase[i%expandableBase.length], k=lessons.length+1;
+    const module=expandableModules[moduleCursor%expandableModules.length];
+    const currentTotal=base.filter((lesson)=>lesson.module===module.id).length+generatedByModule.get(module.id);
+    if(currentTotal>=targetPerModule){
+      moduleCursor++;
+      continue;
+    }
+    const pool=sourceByModule.get(module.id);
+    const generatedIndex=generatedByModule.get(module.id);
+    const source=pool[generatedIndex%pool.length];
+    const k=lessons.length+1;
     lessons.push({
       ...source,
       id:"L"+String(k).padStart(3,"0"),
       order:k,
-      title:source.title+" · Practice "+(Math.floor(i/expandableBase.length)+1),
+      title:source.title+" · Practice "+(Math.floor(generatedIndex/pool.length)+1),
       evidence:"Transfer the same concept to a new dataset, constraint or failure mode.",
       deliverable:"A transfer artifact with evidence showing what changed and what remained invariant."
     });
-    i++;
+    generatedByModule.set(module.id,generatedIndex+1);
+    moduleCursor++;
   }
   return lessons;
 }
