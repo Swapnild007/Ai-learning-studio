@@ -262,11 +262,14 @@ function openLesson(lessonId) {
 
         <div class="dossier">
           ${dossierSection("Prerequisites", lesson.prerequisite)}
-          ${lesson.lessonBody ? dossierSection("Lesson", lesson.lessonBody) : ""}
+          ${lesson.whyItMatters ? dossierSection("Why this matters", lesson.whyItMatters) : ""}
+          ${lesson.lessonBody ? dossierSection("Start here", lesson.lessonBody) : ""}
           ${dossierListSection("Mental model", lesson.mentalModel)}
+          ${dossierListSection("Beginner vocabulary", lesson.vocabulary)}
           ${dossierSection("Mathematical model", lesson.math)}
           ${dossierSection("Mechanism", lesson.mechanism)}
           ${lesson.workedExample ? dossierSection(lesson.workedExample.title, lesson.workedExample.text + " " + lesson.workedExample.steps.join(" ")) : ""}
+          ${lesson.secondExample ? dossierSection(lesson.secondExample.title, lesson.secondExample.text + " " + lesson.secondExample.steps.join(" ")) : ""}
 
           <section class="dossier-section">
             <h3>Implementation</h3>
@@ -275,6 +278,7 @@ function openLesson(lessonId) {
           </section>
 
           ${dossierListSection("Practice before you code", lesson.practice, true)}
+          ${dossierListSection("Beginner warnings", lesson.beginnerWarnings)}
           ${dossierSection("Experiment", lesson.experiment)}
           ${lesson.lab ? dossierSection(lesson.lab.title, lesson.lab.objective + " " + lesson.lab.steps.join(" ") + " Success condition: " + lesson.lab.success) : ""}
           ${dossierSection("Failure analysis", lesson.failure)}
@@ -282,6 +286,7 @@ function openLesson(lessonId) {
           ${dossierSection("Mastery evidence", lesson.evidence)}
           ${dossierSection("Deliverable", lesson.deliverable)}
           ${lesson.takeaway ? dossierSection("Takeaway", lesson.takeaway) : ""}
+          ${lesson.lessonBodyExtra ? dossierSection("Connecting to later ML", lesson.lessonBodyExtra) : ""}
 
           <section class="dossier-section">
             <h3>Checkpoint</h3>
