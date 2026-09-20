@@ -38,9 +38,14 @@ jobs:
           node --check curriculum.js
           node --check learning-engine.js
           node --check learning-engine.test.js
+          node --check syntax-primer.js
+          node --check syntax_primer_qa.js
 
       - name: Run learning engine tests
         run: node learning-engine.test.js
 
       - name: Run curriculum runtime QA
         run: node curriculum_runtime_qa.js
+
+      - name: Run syntax primer QA
+        run: node syntax_primer_qa.js
