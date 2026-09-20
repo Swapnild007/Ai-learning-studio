@@ -38,6 +38,57 @@ Engineering:u=>["Reproduce a realistic failure.","Instrument the relevant metric
 Experiment:u=>["Predeclare a hypothesis and primary metric.","Change one meaningful factor and repeat the measurement.","Separate observation, interpretation, uncertainty and limitation."],
 Research:u=>["Frame a falsifiable question with a meaningful baseline.","Define what result would disconfirm it and run the protocol.","Report negative results, threats to validity and the next experiment."]
 };
+
+// Applied AI Tools catalog — current ecosystem, taught as tool fluency rather than vendor memorization.
+// Each tool is tied to a concrete workflow, verification habit and failure mode.
+const AI_TOOLS=[
+ {id:"chatgpt",name:"ChatGPT",category:"General AI / Work",skills:["prompting","deep research","files","workflows","coding"],mission:"Turn a vague task into a verified research-to-deliverable workflow; compare the model's claims against primary sources."},
+ {id:"claude",name:"Claude",category:"General AI / Coding",skills:["reasoning","long-context analysis","coding","artifacts"],mission:"Use a long-context model to analyze a multi-file technical problem and produce a traceable implementation plan."},
+ {id:"gemini",name:"Gemini",category:"General AI / Multimodal",skills:["multimodal","tool use","function calling","grounded workflows"],mission:"Build a tool-calling workflow and verify every returned argument before execution."},
+ {id:"perplexity",name:"Perplexity",category:"AI Search / Research",skills:["web research","citations","source comparison"],mission:"Answer a research question using visible sources, then replace secondary claims with primary evidence."},
+ {id:"notebooklm",name:"NotebookLM",category:"Research / Learning",skills:["source-grounded synthesis","study guides","audio summaries"],mission:"Create a source-grounded study brief and identify which claims are actually supported by the uploaded corpus."},
+ {id:"github-copilot",name:"GitHub Copilot",category:"Coding",skills:["code completion","review","tests","repository context"],mission:"Generate an implementation only after writing the contract and tests; review every generated change."},
+ {id:"cursor",name:"Cursor",category:"Coding Agent / IDE",skills:["codebase reasoning","agent edits","debugging","refactoring"],mission:"Give an agent a bounded repository task, inspect its diff, run tests and reject unsupported changes."},
+ {id:"codex",name:"OpenAI Codex",category:"Coding Agent",skills:["end-to-end coding","testing","review","automation"],mission:"Delegate a real engineering task with acceptance criteria, then verify the resulting code and tests."},
+ {id:"claude-code",name:"Claude Code",category:"Coding Agent / Terminal",skills:["terminal agents","codebase tasks","automation"],mission:"Run a constrained terminal coding workflow with explicit permissions and regression checks."},
+ {id:"vscode-ai",name:"VS Code AI workflows",category:"Developer Tooling",skills:["editor agents","debugging","extensions"],mission:"Combine editor assistance with tests and static analysis instead of accepting generated code blindly."},
+ {id:"hugging-face",name:"Hugging Face",category:"Models / Open Source",skills:["model discovery","datasets","transformers","spaces"],mission:"Select an open model from its card, inspect license and evaluation evidence, then run a reproducible inference test."},
+ {id:"ollama",name:"Ollama",category:"Local AI",skills:["local inference","model management","privacy"],mission:"Run a local model, measure latency and memory, and compare its behavior with a hosted baseline."},
+ {id:"lm-studio",name:"LM Studio",category:"Local AI",skills:["local models","API serving","experimentation"],mission:"Serve a local model through an API and measure throughput, latency and context behavior."},
+ {id:"open-webui",name:"Open WebUI",category:"Local AI / Interface",skills:["local assistants","RAG","model routing"],mission:"Configure a local AI interface and document model, retrieval and permission boundaries."},
+ {id:"langgraph",name:"LangGraph",category:"Agent Framework",skills:["state machines","agent graphs","durable workflows"],mission:"Build a bounded stateful agent graph with explicit transitions, retries and termination."},
+ {id:"openai-agents-sdk",name:"OpenAI Agents SDK",category:"Agent Framework",skills:["agents","tools","handoffs","tracing"],mission:"Build an agent with typed tools and inspect the trace before trusting the final result."},
+ {id:"pydantic-ai",name:"PydanticAI",category:"Agent Framework",skills:["typed agents","structured outputs","validation"],mission:"Create a typed agent interface where invalid tool arguments fail safely."},
+ {id:"mcp",name:"Model Context Protocol (MCP)",category:"Tool Connectivity",skills:["tool servers","resources","permissions","context"],mission:"Connect a model to a narrowly scoped tool server and audit the permissions exposed."},
+ {id:"langfuse",name:"Langfuse",category:"LLM Observability",skills:["tracing","cost","latency","evaluation"],mission:"Trace an LLM workflow and identify the exact step responsible for quality or latency regression."},
+ {id:"arize-phoenix",name:"Arize Phoenix",category:"AI Observability",skills:["tracing","evaluations","RAG debugging"],mission:"Inspect traces and evaluate retrieval and generation separately."},
+ {id:"promptfoo",name:"Promptfoo",category:"AI Evaluation",skills:["evals","red teaming","regression tests"],mission:"Create a prompt regression suite with adversarial cases and measurable pass/fail criteria."},
+ {id:"qdrant",name:"Qdrant",category:"Vector Search",skills:["embeddings","vector retrieval","filters"],mission:"Build a small semantic retrieval index and evaluate recall before adding a generator."},
+ {id:"pgvector",name:"pgvector",category:"Vector Database",skills:["SQL","embeddings","hybrid retrieval"],mission:"Implement vector search inside PostgreSQL and compare retrieval quality with a simple lexical baseline."},
+ {id:"pinecone",name:"Pinecone",category:"Vector Infrastructure",skills:["managed vector search","metadata filters","retrieval"],mission:"Design a production-style vector retrieval schema and measure recall/latency trade-offs."},
+ {id:"weaviate",name:"Weaviate",category:"Vector Database",skills:["vector search","hybrid search","metadata"],mission:"Compare semantic and hybrid retrieval on a labeled query set."},
+ {id:"firecrawl",name:"Firecrawl",category:"Web Data / RAG",skills:["web extraction","crawl","structured content"],mission:"Create a reproducible web-ingestion pipeline and validate source freshness and provenance."},
+ {id:"v0",name:"v0",category:"AI UI / Prototyping",skills:["UI generation","React","rapid prototyping"],mission:"Generate a UI prototype, then convert the visual result into explicit accessibility and component requirements."},
+ {id:"lovable",name:"Lovable",category:"AI App Builder",skills:["rapid app generation","full-stack prototypes"],mission:"Build a small app from a specification and audit generated architecture, dependencies and security."},
+ {id:"replit-agent",name:"Replit Agent",category:"AI App Builder",skills:["app generation","deployment","debugging"],mission:"Generate a working prototype, inspect the implementation and reproduce it locally."},
+ {id:"bolt",name:"Bolt",category:"AI App Builder",skills:["web generation","prototyping","iteration"],mission:"Turn a product brief into a prototype and test the generated interaction paths."},
+ {id:"canva-ai",name:"Canva AI",category:"Design / Content",skills:["visual generation","presentations","brand workflows"],mission:"Create a visual asset from a structured brief and verify hierarchy, consistency and factual copy."},
+ {id:"figma-ai",name:"Figma AI",category:"Design / Product",skills:["UI generation","design systems","prototyping"],mission:"Generate a UI direction, then translate it into reusable components and design tokens."},
+ {id:"midjourney",name:"Midjourney",category:"Image Generation",skills:["visual ideation","style control","composition"],mission:"Iterate a visual prompt while documenting which variables changed and evaluating consistency."},
+ {id:"runway",name:"Runway",category:"Video Generation",skills:["video generation","editing","visual workflows"],mission:"Produce a short visual sequence and evaluate temporal consistency and prompt adherence."},
+ {id:"elevenlabs",name:"ElevenLabs",category:"Voice / Audio",skills:["speech generation","voice workflows","audio"],mission:"Create a narrated learning artifact and evaluate pronunciation, pacing and factual alignment."},
+ {id:"suno",name:"Suno",category:"Music Generation",skills:["music generation","creative workflows"],mission:"Generate music from a structured brief and evaluate adherence to constraints."},
+ {id:"descript",name:"Descript",category:"AI Media Editing",skills:["transcription","editing","voice"],mission:"Transform a transcript into an edited instructional clip while checking every generated edit."},
+ {id:"zapier-ai",name:"Zapier AI",category:"Automation",skills:["workflow automation","connectors","actions"],mission:"Automate a multi-step task with explicit triggers, permissions, retries and failure handling."},
+ {id:"make-ai",name:"Make",category:"Automation",skills:["workflow orchestration","APIs","automation"],mission:"Build a visual automation and identify every state transition and failure path."},
+ {id:"n8n",name:"n8n",category:"Automation / Self-hosted",skills:["workflow automation","webhooks","agents"],mission:"Create a self-hosted AI workflow with secrets isolation and deterministic error handling."},
+ {id:"aws-bedrock",name:"Amazon Bedrock",category:"Model Platform",skills:["model APIs","agents","guardrails","RAG"],mission:"Compare model invocation and tool/RAG patterns behind a provider-neutral interface."},
+ {id:"azure-ai",name:"Azure AI",category:"Model Platform",skills:["enterprise AI","model deployment","evaluation"],mission:"Design an enterprise AI workflow with identity, logging and evaluation boundaries."},
+ {id:"google-ai-studio",name:"Google AI Studio",category:"Model Prototyping",skills:["Gemini","prompting","tool use"],mission:"Prototype a multimodal tool workflow and inspect function-call arguments before execution."},
+ {id:"vertex-ai",name:"Vertex AI",category:"ML Platform",skills:["model development","evaluation","deployment"],mission:"Design a model lifecycle from experiment to monitored endpoint with explicit artifact lineage."},
+ {id:"weights-biases",name:"Weights & Biases",category:"ML Experimentation",skills:["experiment tracking","artifacts","sweeps"],mission:"Track an experiment family and prove which configuration produced the reported result."}
+];
+globalThis.AI_TOOLS=AI_TOOLS;
 const kind=["baseline transfer","edge-case transfer","scale transfer","ablation transfer","adversarial transfer","systems transfer","research transfer"];\nconst CONCEPTS={
 "Regression & Classification":["Linear regression geometry","Loss functions and residuals","Logistic logits and probabilities","Regularization and feature scaling","Decision thresholds","Calibration","Imbalance and class-weighted learning"],
 "Trees & Ensembles":["Recursive partitioning","Gini and entropy","Pruning and depth","Bootstrap aggregation","Random feature selection","Boosting residuals","Feature importance and leakage"],
