@@ -254,10 +254,28 @@ function buildLessons(){
       }
     }
   }
+  /*
+   * Do not pad a module by cloning its own lessons.
+   * The previous implementation reused the first base lesson repeatedly,
+   * which caused every generated practice lesson to retain module:"m1".
+   * That made Module 01 incorrectly display hundreds of lessons.
+   *
+   * Keep Module 01 at its authored 30 lessons. Future target capacity is
+   * distributed across Modules 02-06 so generated practice records retain
+   * their source module identity.
+   */
   let i=0;
+  const expandableBase=base.filter((lesson)=>lesson.module!=="m1");
   while(lessons.length<CURRICULUM.meta.targetLessons){
-    const source=base[i%base.length], k=lessons.length+1;
-    lessons.push({...source,id:"L"+String(k).padStart(3,"0"),order:k,title:source.title+" · Practice "+(Math.floor(i/base.length)+1),evidence:"Transfer the same concept to a new dataset, constraint or failure mode.",deliverable:"A transfer artifact with evidence showing what changed and what remained invariant."});
+    const source=expandableBase[i%expandableBase.length], k=lessons.length+1;
+    lessons.push({
+      ...source,
+      id:"L"+String(k).padStart(3,"0"),
+      order:k,
+      title:source.title+" · Practice "+(Math.floor(i/expandableBase.length)+1),
+      evidence:"Transfer the same concept to a new dataset, constraint or failure mode.",
+      deliverable:"A transfer artifact with evidence showing what changed and what remained invariant."
+    });
     i++;
   }
   return lessons;
