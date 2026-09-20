@@ -27,8 +27,8 @@
       card.style.setProperty('--tile-index', i);
     });
     if (!$('#homeSignals')) {
-      const completed = window.state && state.completed ? state.completed.size : 0;
-      const total = Array.isArray(window.LESSONS) ? LESSONS.length : 520;
+      const completed = typeof state !== 'undefined' && state.completed ? state.completed.size : 0;
+      const total = typeof LESSONS !== 'undefined' && Array.isArray(LESSONS) ? LESSONS.length : 520;
       const pct = total ? Math.round(completed / total * 100) : 0;
       hero.insertAdjacentHTML('afterend', [
         '<section class="home-signal-grid" id="homeSignals">',
@@ -44,7 +44,7 @@
     const main = $('#main'); if (!main) return;
     main.classList.add('experience-learn');
     const grid = $('.grid', main); if (!grid || $('#knowledgeMap')) return;
-    const modules = Array.isArray(window.CURRICULUM?.modules) ? CURRICULUM.modules : [];
+    const modules = typeof CURRICULUM !== 'undefined' && Array.isArray(CURRICULUM.modules) ? CURRICULUM.modules : [];
     const nodes = modules.map((m, i) => [
       '<button class="knowledge-node" data-kg-module="', m.id, '" style="--node-index:', i, '">',
       '<span class="knowledge-node-number">', String(m.number).padStart(2,'0'), '</span>',
@@ -63,7 +63,7 @@
   }
 
   function moduleCount(id) {
-    return Array.isArray(window.LESSONS) ? LESSONS.filter(x => x.module === id).length : 0;
+    return typeof LESSONS !== 'undefined' && Array.isArray(LESSONS) ? LESSONS.filter(x => x.module === id).length : 0;
   }
 
   function escapeText(value) {
@@ -145,7 +145,7 @@
         return result;
       };
     }
-    requestAnimationFrame(() => enhance(window.state?.view || 'home'));
+    requestAnimationFrame(() => enhance(typeof state !== 'undefined' ? state.view : 'home'));
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install, {once:true}); else install();
 })();
