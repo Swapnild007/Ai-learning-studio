@@ -20,11 +20,20 @@ for (const module of curriculum.modules) {
   if (module.id === "m1" && count !== 30) {
     throw new Error(`Module 01 expected 30 lessons, got ${count}`);
   }
+  if (module.id === "m1" && !module.masteryGate) {
+    throw new Error("Module 01 mastery gate is missing");
+  }
+  if (module.id === "m1" && module.masteryGate.criteria.length < 5) {
+    throw new Error("Module 01 mastery gate criteria are incomplete");
+  }
 }
 
 for (const lesson of lessons) {
   if (!Array.isArray(lesson.checkpoint) || lesson.checkpoint.length !== 3) {
     throw new Error(`${lesson.id}: checkpoint missing or incomplete`);
+  }
+  if (lesson.module === "m1" && lesson.code.includes("run_experiment")) {
+    throw new Error(`${lesson.id}: placeholder code scaffold remains`);
   }
   for (const field of ["checkpointAnswers", "highlights", "keyNotes"]) {
     if (!Array.isArray(lesson[field]) || lesson[field].length === 0) {
