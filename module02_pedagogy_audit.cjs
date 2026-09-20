@@ -32,5 +32,11 @@ for(const l of lessons){
 if(new Set(lessons.map(x=>x.code)).size!==30) failures.push("Stage code is duplicated across authored lessons");
 if(lessons.some(x=>x.title.includes("Practice"))) failures.push("Practice records leaked into authored core set");
 if(ctx.__CURRICULUM.meta.targetLessons!==520) failures.push("Curriculum target changed unexpectedly");
+for(const module of ctx.__CURRICULUM.modules){
+  const count=ctx.__LESSONS.filter(x=>x.module===module.id).length;
+  const expected=module.id==="m1"?30:98;
+  if(count!==expected) failures.push(module.id+": expected "+expected+" lessons, got "+count);
+}
+if(ctx.__LESSONS.length!==520) failures.push("Expected 520 total lessons, got "+ctx.__LESSONS.length);
 if(failures.length){console.error(failures.join("\n"));process.exit(1);}
 console.log("Module 02 pedagogical QA PASS: 30 authored lessons, stage/title alignment, stage-specific math/mechanism, examples, checkpoints, unique executable Python syntax, and no placeholder code.");
