@@ -290,12 +290,16 @@ function openLesson(lessonId) {
 
           <section class="dossier-section">
             <h3>Checkpoint</h3>
-            <ul>
+            <ol class="checkpoint-list">
               ${lesson.checkpoint
                 .map((item) => `<li>${escapeHtml(item)}</li>`)
                 .join("")}
-            </ul>
+            </ol>
           </section>
+
+          ${dossierListSection("Checkpoint answers", lesson.checkpointAnswers, true)}
+          ${dossierListSection("Highlights", lesson.highlights)}
+          ${dossierListSection("Key notes", lesson.keyNotes)}
         </div>
       </article>
 
