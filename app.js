@@ -478,45 +478,115 @@ function progressView() {
 
 function labs() {
   const labNames = [
-    "Numerical stability",
-    "Gradient checking",
-    "Evaluation harness",
-    "Attention visualization",
-    "Retrieval evaluation",
-    "Inference benchmarking"
+    {
+      id: "numerical-stability",
+      name: "Numerical stability",
+      objective: "Compare a naive computation with a numerically stable formulation and explain the error.",
+      steps: ["Create the baseline computation.", "Increase the conditioning challenge.", "Measure absolute error.", "Explain the stability boundary."]
+    },
+    {
+      id: "gradient-checking",
+      name: "Gradient checking",
+      objective: "Validate an analytical gradient against finite differences before trusting a training implementation.",
+      steps: ["Implement the analytical gradient.", "Compute finite-difference estimates.", "Sweep epsilon.", "Investigate the largest disagreement."]
+    },
+    {
+      id: "evaluation-harness",
+      name: "Evaluation harness",
+      objective: "Build a repeatable evaluation protocol that separates data, metric, model and reporting errors.",
+      steps: ["Freeze the dataset split.", "Define metrics before running.", "Execute the baseline.", "Record failures and regression checks."]
+    },
+    {
+      id: "attention-visualization",
+      name: "Attention visualization",
+      objective: "Inspect attention weights and test whether the visualization supports the claimed mechanism.",
+      steps: ["Select a fixed input.", "Inspect attention weights.", "Change one token or mask condition.", "Compare behavior with the prediction."]
+    },
+    {
+      id: "retrieval-evaluation",
+      name: "Retrieval evaluation",
+      objective: "Measure whether a retrieval system finds useful evidence before optimizing generation.",
+      steps: ["Create a small query set.", "Define relevant documents.", "Measure recall@k.", "Inspect misses and latency."]
+    },
+    {
+      id: "inference-benchmarking",
+      name: "Inference benchmarking",
+      objective: "Measure latency and throughput under controlled serving conditions.",
+      steps: ["Warm the runtime.", "Run repeated measurements.", "Report p50/p95 and throughput.", "Explain the dominant bottleneck."]
+    }
   ];
 
   layout(
     "Labs",
-    "Experiments are first-class learning objects.",
+    "Controlled experiments with a baseline, intervention, measurement and conclusion.",
     `
+      <section class="card" style="margin-bottom:16px">
+        <div class="module-num">EXPERIMENT PROTOCOL</div>
+        <h2 style="margin:6px 0 8px">Build → break → measure → explain</h2>
+        <p style="color:var(--muted);max-width:850px">
+          These labs are functional learning workspaces. Each one gives you a controlled protocol rather than a passive article.
+        </p>
+      </section>
       <div class="grid">
-        ${labNames
-          .map(
-            (name, index) => `
-              <article class="card">
-                <div class="module-num">
-                  LAB ${String(index + 1).padStart(2, "0")}
-                </div>
-                <h3>${escapeHtml(name)}</h3>
-                <p style="color:var(--muted)">
-                  Run a controlled experiment, change one variable and preserve
-                  the evidence.
-                </p>
-                <button class="action secondary" data-lab>
-                  Open lab
-                </button>
-              </article>
-            `
-          )
-          .join("")}
+        ${labNames.map((lab, index) => `
+          <article class="card">
+            <div class="module-num">LAB ${String(index + 1).padStart(2, "0")}</div>
+            <h3>${escapeHtml(lab.name)}</h3>
+            <p style="color:var(--muted)">${escapeHtml(lab.objective)}</p>
+            <button class="action secondary" data-lab-id="${escapeAttribute(lab.id)}">Open lab</button>
+          </article>
+        `).join("")}
       </div>
     `
   );
 
-  $$("[data-lab]").forEach((button) => {
+  $$("[data-lab-id]").forEach((button) => {
     button.addEventListener("click", () => {
-      toast("Lab workspace is the next vertical slice");
+      const lab = labNames.find((item) => item.id === button.dataset.labId);
+      if (!lab) return;
+      layout(
+        lab.name,
+        "Controlled lab",
+        `
+          <div class="lesson-layout">
+            <article class="card reader">
+              <div class="kicker">LAB WORKSPACE</div>
+              <h1>${escapeHtml(lab.name)}</h1>
+              <p class="lead">${escapeHtml(lab.objective)}</p>
+              <section class="dossier-section">
+                <h3>Protocol</h3>
+                <ol class="checkpoint-list">
+                  ${lab.steps.map((step) => `<li>${escapeHtml(step)}</li>`).join("")}
+                </ol>
+              </section>
+              <section class="dossier-section">
+                <h3>Evidence record</h3>
+                <label style="display:block;font-size:12px;color:var(--muted);margin-bottom:8px" for="labObservation">Observation</label>
+                <textarea id="labObservation" rows="7" style="width:100%;resize:vertical;padding:12px;border:1px solid var(--line);border-radius:14px;background:white;outline:none" placeholder="Record measurements, failures and what changed."></textarea>
+                <button class="action" id="saveLabEvidence">Save local evidence</button>
+                <p id="labEvidenceStatus" style="font-size:12px;color:var(--muted);margin-bottom:0"></p>
+              </section>
+            </article>
+            <aside class="card side-card">
+              <div class="kicker">SUCCESS CONDITION</div>
+              <h3>Reproducible evidence</h3>
+              <p style="color:var(--muted);font-size:12px;line-height:1.6">A useful result includes the baseline, changed variable, measurements, interpretation and limitations.</p>
+              <button class="action secondary" id="backToLabs">Back to Labs</button>
+            </aside>
+          </div>
+        `
+      );
+      const key = "als-lab-" + lab.id;
+      const observation = localStorage.getItem(key) || "";
+      const input = $("#labObservation");
+      const status = $("#labEvidenceStatus");
+      if (input) input.value = observation;
+      $("#saveLabEvidence")?.addEventListener("click", () => {
+        localStorage.setItem(key, input?.value || "");
+        if (status) status.textContent = "Evidence saved locally.";
+        toast("Lab evidence saved");
+      });
+      $("#backToLabs")?.addEventListener("click", labs);
     });
   });
 }
@@ -601,38 +671,88 @@ function aiTools() {
 
 function projects() {
   const projectNames = [
-    "From-scratch ML baseline",
-    "Neural network + debugging log",
-    "Minimal GPT + tokenizer",
-    "Distributed training benchmark",
-    "Agent + red-team report",
-    "Research ablation"
+    {id:"ml-baseline",name:"From-scratch ML baseline",domain:"Classical ML",deliverable:"A tested baseline with metric report, error analysis and reproducibility notes."},
+    {id:"nn-debugging",name:"Neural network + debugging log",domain:"Deep Learning",deliverable:"A working model plus gradient/activation diagnostics and a failure narrative."},
+    {id:"minimal-gpt",name:"Minimal GPT + tokenizer",domain:"Generative AI",deliverable:"A small autoregressive model with tokenizer, training trace and evaluation."},
+    {id:"distributed-benchmark",name:"Distributed training benchmark",domain:"AI Systems",deliverable:"A scaling report covering throughput, communication cost and bottlenecks."},
+    {id:"agent-redteam",name:"Agent + red-team report",domain:"Agentic AI",deliverable:"A bounded agent, adversarial test suite and safety findings."},
+    {id:"research-ablation",name:"Research ablation",domain:"Research Engineering",deliverable:"A hypothesis-driven experiment with baselines, ablations, uncertainty and limitations."}
   ];
 
   layout(
     "Projects",
-    "Portfolio artifacts built from the curriculum.",
+    "Portfolio-grade artifacts built from concepts, labs and evidence.",
     `
+      <section class="card" style="margin-bottom:16px">
+        <div class="module-num">PROJECT WORKSPACE</div>
+        <h2 style="margin:6px 0 8px">Build something you can defend</h2>
+        <p style="color:var(--muted);max-width:850px">Each project is defined by a deliverable, evaluation evidence and a technical explanation—not by a title alone.</p>
+      </section>
       <div class="grid">
-        ${projectNames
-          .map(
-            (name, index) => `
-              <article class="card">
-                <div class="module-num">
-                  PROJECT ${String(index + 1).padStart(2, "0")}
-                </div>
-                <h3>${escapeHtml(name)}</h3>
-                <p style="color:var(--muted)">
-                  Artifact-driven work with code, measurements, limitations and
-                  reproducibility notes.
-                </p>
-              </article>
-            `
-          )
-          .join("")}
+        ${projectNames.map((project, index) => `
+          <article class="card">
+            <div class="module-num">PROJECT ${String(index + 1).padStart(2, "0")} · ${escapeHtml(project.domain)}</div>
+            <h3>${escapeHtml(project.name)}</h3>
+            <p style="color:var(--muted)">${escapeHtml(project.deliverable)}</p>
+            <button class="action secondary" data-project-id="${escapeAttribute(project.id)}">Open project</button>
+          </article>
+        `).join("")}
       </div>
     `
   );
+
+  $$("[data-project-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const project = projectNames.find((item) => item.id === button.dataset.projectId);
+      if (!project) return;
+      layout(
+        project.name,
+        project.domain,
+        `
+          <div class="lesson-layout">
+            <article class="card reader">
+              <div class="kicker">PROJECT WORKSPACE</div>
+              <h1>${escapeHtml(project.name)}</h1>
+              <section class="dossier-section">
+                <h3>Deliverable</h3>
+                <p>${escapeHtml(project.deliverable)}</p>
+              </section>
+              <section class="dossier-section">
+                <h3>Build plan</h3>
+                <ol class="checkpoint-list">
+                  <li>Write the problem statement and acceptance criteria.</li>
+                  <li>Establish a reproducible baseline.</li>
+                  <li>Implement the smallest useful system.</li>
+                  <li>Test normal, boundary and adversarial cases.</li>
+                  <li>Measure performance and explain failure modes.</li>
+                  <li>Package the artifact with limitations and reproduction steps.</li>
+                </ol>
+              </section>
+              <section class="dossier-section">
+                <h3>Project notes</h3>
+                <textarea id="projectNotes" rows="9" style="width:100%;resize:vertical;padding:12px;border:1px solid var(--line);border-radius:14px;background:white;outline:none" placeholder="Track decisions, experiments, evidence and open questions."></textarea>
+                <button class="action" id="saveProjectNotes">Save local notes</button>
+              </section>
+            </article>
+            <aside class="card side-card">
+              <div class="kicker">EVIDENCE</div>
+              <h3>Artifact + tests + explanation</h3>
+              <p style="color:var(--muted);font-size:12px;line-height:1.6">A finished project should be reproducible by another engineer and honest about limitations.</p>
+              <button class="action secondary" id="backToProjects">Back to Projects</button>
+            </aside>
+          </div>
+        `
+      );
+      const key = "als-project-" + project.id;
+      const notes = $("#projectNotes");
+      if (notes) notes.value = localStorage.getItem(key) || "";
+      $("#saveProjectNotes")?.addEventListener("click", () => {
+        localStorage.setItem(key, notes?.value || "");
+        toast("Project notes saved");
+      });
+      $("#backToProjects")?.addEventListener("click", projects);
+    });
+  });
 }
 
 function route(view) {
