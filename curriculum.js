@@ -85,7 +85,54 @@ const STAGE_DETAIL = {
 
 function buildLessons(){
   const stages=["Foundation","Derivation","Implementation","Engineering","Experiment","Research"];
-  const lessons=[], base=[];
+  const lessons=[], base=[];\n  const authoredLessons = {
+    L001: {
+      lessonBody: "Linear algebra is the language used to represent data, parameters and transformations in machine learning. The first discipline is not memorizing matrix notation. It is learning to reason about what an object represents, what shape it has, what operation is being performed, and what the result means. A feature vector can represent one observation, a matrix can represent a dataset or a transformation, and a weight vector can turn features into a prediction. Once these relationships are explicit, later topics such as linear regression, PCA, neural-network layers and attention become much easier to inspect rather than merely memorize.",
+      mentalModel: [
+        "A vector is an ordered collection of numbers. In ML, one vector can represent one example, one parameter set, one embedding, or one gradient.",
+        "A matrix is a rectangular arrangement of numbers. It can represent many examples at once or a transformation from one coordinate space to another.",
+        "Matrix multiplication is not arbitrary multiplication. It composes weighted sums and therefore represents a structured transformation.",
+        "Shape is a contract. If A has shape (m,n) and x has shape (n,), Ax has shape (m,). A mismatch is not a cosmetic error: it means the mathematical operation is undefined."
+      ],
+      workedExample: {
+        title: "Worked example: a two-feature prediction",
+        text: "Suppose one observation is x = [2, 3] and the model weights are w = [0.5, 2]. The dot product is x·w = 2(0.5) + 3(2) = 7. The same computation can be written as a 1×2 matrix multiplied by a 2×1 vector. The scalar calculation and the matrix calculation are the same operation expressed at different levels of abstraction.",
+        steps: [
+          "Write the feature vector x with two features.",
+          "Write the parameter vector w with one weight per feature.",
+          "Multiply corresponding entries: 2×0.5 and 3×2.",
+          "Add the products to obtain the prediction contribution, 7.",
+          "Check the dimensions before multiplying: (1×2)(2×1) → (1×1)."
+        ]
+      },
+      practice: [
+        "For A with shape (3,4) and x with shape (4,), predict the shape of Ax before calculating anything.",
+        "For x=[1,2,4] and w=[3,-1,0.5], calculate x·w by hand.",
+        "Explain in one sentence why (3×4)(3,) is invalid.",
+        "Write a test that deliberately passes a vector with the wrong number of features."
+      ],
+      lab: {
+        title: "Shape contract lab",
+        objective: "Build a tiny matrix-vector function and make its shape contract explicit.",
+        steps: [
+          "Create a 3×2 matrix and a length-2 vector.",
+          "Implement matrix-vector multiplication using nested loops.",
+          "Add an assertion that every row has the same length as the vector.",
+          "Compare your result with NumPy on at least ten random inputs.",
+          "Add one failing test using a length-3 vector and explain the failure."
+        ],
+        success: "The implementation agrees with the reference within floating-point tolerance and rejects invalid shapes with a clear diagnostic."
+      },
+      misconceptions: [
+        "Elementwise multiplication and matrix multiplication are different operations.",
+        "A transpose changes orientation and therefore changes which dimensions can legally multiply.",
+        "Broadcasting can make code execute even when the intended mathematical operation was wrong.",
+        "Exact floating-point equality is usually the wrong correctness criterion for numerical implementations."
+      ],
+      takeaway: "Before calculating, identify what every number represents and write down the shape of every object. This habit becomes a debugging tool for regression, neural networks, transformers and distributed tensors."
+    }
+  };
+
   let n=1;
   for(const module of CURRICULUM.modules){
     for(const [unit,scope] of module.units){
@@ -113,6 +160,7 @@ function buildLessons(){
           evidence:profile ? profile.evidence : "Explain the concept, produce a working implementation and document the evidence.",
           deliverable:profile ? stageInfo.deliverable : "A reproducible learning artifact with code, measurements and a written explanation.",
           code:profile ? "# "+stage+": "+unit+"\n# Build the smallest reproducible version.\nresult = run_experiment(seed=42)\nprint(result)" : "# Build the smallest reproducible experiment.\nresult = run_experiment(seed=42)\nprint(result)",
+          ...authoredLessons["L"+String(n).padStart(3,"0")],
           checkpoint:[
             "What assumption or invariant is this lesson testing?",
             "What observation would falsify your current explanation?",
