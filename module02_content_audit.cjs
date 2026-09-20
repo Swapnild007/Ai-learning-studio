@@ -13,7 +13,7 @@ for(const token of required) if(!s.includes(token)) throw new Error("Missing aud
 const banned=[
   "Information gain = impurity reduction after a split.",
   "Weak learner = model performing above a trivial baseline.",
-  "url:"https://ocw.mit.edu/courses/res-tll-008-social-and-ethical-responsibilities-of-computing-serc/""
+  'url:"https://ocw.mit.edu/courses/res-tll-008-social-and-ethical-responsibilities-of-computing-serc/"'
 ];
 for(const token of banned) if(s.includes(token)) throw new Error("Outdated/inaccurate wording remains: "+token);
 console.log("Module 02 content accuracy audit PASS");
