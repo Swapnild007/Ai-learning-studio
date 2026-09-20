@@ -50,6 +50,9 @@ jobs:
       - name: Run learning engine tests
         run: node learning-engine.test.js
 
+      - name: Run concept depth QA
+        run: node curriculum_concept_depth_qa.cjs
+
       - name: Run curriculum runtime QA
         run: node curriculum_runtime_qa.js
 
