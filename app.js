@@ -521,6 +521,84 @@ function labs() {
   });
 }
 
+function aiTools() {
+  const tools = Array.isArray(window.AI_TOOLS) ? window.AI_TOOLS : [];
+  const categories = [...new Set(tools.map((tool) => tool.category))];
+  layout(
+    "AI Tools",
+    "Learn the modern AI toolchain by workflow, not by memorizing product names.",
+    `
+      <section class="card" style="margin-bottom:16px">
+        <div class="module-num">TOOL FLUENCY</div>
+        <h2 style="margin:6px 0 8px">From prompting to production</h2>
+        <p style="color:var(--muted);max-width:850px">
+          Every tool is taught through a real task, verification step, failure mode and evidence requirement.
+          Tools change quickly; the transferable skill is knowing how to select, operate, evaluate and secure them.
+        </p>
+        <div class="pill-row">
+          <span class="pill">${tools.length} tools</span>
+          <span class="pill">${categories.length} categories</span>
+          <span class="pill">Hands-on missions</span>
+        </div>
+      </section>
+      <div class="grid">
+        ${tools.map((tool) => `
+          <article class="card">
+            <div class="module-num">${escapeHtml(tool.category)}</div>
+            <h3>${escapeHtml(tool.name)}</h3>
+            <div class="pill-row">${tool.skills.map((skill) => `<span class="pill">${escapeHtml(skill)}</span>`).join("")}</div>
+            <p style="color:var(--muted);margin:14px 0">${escapeHtml(tool.mission)}</p>
+            <button class="action secondary" data-tool-id="${escapeAttribute(tool.id)}">Open mission</button>
+          </article>
+        `).join("")}
+      </div>
+    `
+  );
+  $("[data-tool-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const tool = tools.find((item) => item.id === button.dataset.toolId);
+      if (!tool) return;
+      layout(
+        tool.name,
+        tool.category,
+        `
+          <div class="lesson-layout">
+            <article class="card reader">
+              <div class="kicker">APPLIED AI TOOL MISSION</div>
+              <h1>${escapeHtml(tool.name)}</h1>
+              <div class="pill-row">${tool.skills.map((skill) => `<span class="pill">${escapeHtml(skill)}</span>`).join("")}</div>
+              <section class="dossier-section">
+                <h3>Mission</h3>
+                <p>${escapeHtml(tool.mission)}</p>
+              </section>
+              <section class="dossier-section">
+                <h3>Operating protocol</h3>
+                <ol class="checkpoint-list">
+                  <li>Define the task and acceptance criteria before opening the tool.</li>
+                  <li>Use the smallest permissions and context needed.</li>
+                  <li>Inspect generated output, sources, tool calls and assumptions.</li>
+                  <li>Run an independent test or comparison before trusting the result.</li>
+                  <li>Record what failed, what changed and what evidence supports the final result.</li>
+                </ol>
+              </section>
+              <section class="dossier-section">
+                <h3>Mastery evidence</h3>
+                <p>A completed artifact, verification record, failure analysis and short reflection on where the tool should and should not be trusted.</p>
+              </section>
+            </article>
+            <aside class="card side-card">
+              <div class="kicker">CATEGORY</div>
+              <h3>${escapeHtml(tool.category)}</h3>
+              <button class="action" id="backToTools">Back to AI Tools</button>
+            </aside>
+          </div>
+        `
+      );
+      $("#backToTools")?.addEventListener("click", aiTools);
+    });
+  });
+}
+
 function projects() {
   const projectNames = [
     "From-scratch ML baseline",
