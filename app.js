@@ -256,6 +256,137 @@ function bindLessonRows() {
   });
 }
 
+function module02Interaction(lesson) {
+  if (lesson.module !== "m2") return "";
+
+  const unit = lesson.unit;
+  const configs = {
+    "Regression & Classification": {
+      title: "Prediction Playground",
+      prompt: "Move the regularization strength and predict what happens before applying it.",
+      control: "Regularization λ",
+      min: 0, max: 10, step: 0.1, value: 1,
+      compute: (v) => {
+        const fit = 0.92 - 0.055 * Math.log1p(v);
+        const complexity = 1 / (1 + v);
+        const calibration = Math.min(0.98, 0.68 + 0.24 * Math.exp(-0.45 * Math.abs(v - 1.8)));
+        return {primary: fit, secondary: complexity, tertiary: calibration, labels:["Validation quality","Model flexibility","Calibration"]};
+      },
+      note: "This is a conceptual simulator. Its purpose is to make the regularization trade-off visible before you work with a real dataset."
+    },
+    "Trees & Ensembles": {
+      title: "Tree Split Playground",
+      prompt: "Change tree depth and predict how training fit and generalization will move.",
+      control: "Tree depth",
+      min: 1, max: 12, step: 1, value: 4,
+      compute: (v) => {
+        const train = Math.min(.995, .55 + .42 * (1 - Math.exp(-v / 2.4)));
+        const general = Math.max(.58, .91 - .018 * Math.max(0, v - 4) - .025 * Math.max(0, 2 - v));
+        return {primary: train, secondary: general, tertiary: Math.max(0.05, 1 - Math.abs(v-5)/10), labels:["Training fit","Validation fit","Useful complexity"]};
+      },
+      note: "The curves are illustrative, not a claim about a universal optimum. Your real dataset determines the measured behavior."
+    },
+    "Unsupervised Learning": {
+      title: "Clustering Assumption Lab",
+      prompt: "Increase feature scale and predict whether the cluster assignments should change.",
+      control: "Scale of feature 2",
+      min: 0.2, max: 5, step: 0.1, value: 1,
+      compute: (v) => {
+        const stability = Math.max(.08, 1 - Math.abs(Math.log(v)) * .38);
+        const separation = Math.min(.98, .72 + .25 * Math.exp(-Math.abs(v-1)));
+        const distortion = Math.min(.98, .2 + .16 * Math.abs(v-1));
+        return {primary: stability, secondary: separation, tertiary: distortion, labels:["Assignment stability","Separation signal","Geometry distortion"]};
+      },
+      note: "The interaction illustrates why distance-based methods depend on representation and feature scale."
+    },
+    "Evaluation & Validation": {
+      title: "Evaluation Protocol Lab",
+      prompt: "Increase the number of validation folds and observe the trade-off between estimate stability and compute.",
+      control: "CV folds",
+      min: 2, max: 10, step: 1, value: 5,
+      compute: (v) => {
+        const stability = .55 + .42 * (1 - Math.exp(-v / 3));
+        const compute = Math.max(.1, 1 - (v-2)/10);
+        const leakage = 1;
+        return {primary: stability, secondary: compute, tertiary: leakage, labels:["Estimate stability","Relative compute efficiency","Protocol validity"]};
+      },
+      note: "More folds do not automatically make an evaluation valid. Split boundaries and preprocessing scope still matter."
+    },
+    "ML Engineering Patterns": {
+      title: "Baseline vs Complexity Lab",
+      prompt: "Increase model complexity and predict whether it actually improves the measured workflow.",
+      control: "Model complexity",
+      min: 1, max: 10, step: 1, value: 3,
+      compute: (v) => {
+        const performance = .62 + .28 * (1 - Math.exp(-v / 2.8));
+        const reproducibility = Math.max(.55, .94 - .025 * v);
+        const diagnostic = Math.max(.2, .92 - .04 * Math.max(0, v-5));
+        return {primary: performance, secondary: reproducibility, tertiary: diagnostic, labels:["Measured performance","Workflow reproducibility","Diagnostic clarity"]};
+      },
+      note: "Complexity is not a goal by itself. A candidate model must beat the baseline under the same protocol."
+    }
+  };
+  const cfg = configs[unit];
+  if (!cfg) return "";
+  const id = "m2lab-" + lesson.id.replace(/[^a-zA-Z0-9_-]/g,"");
+  return `
+    <section class="interactive-card" data-m2-interactive data-unit="${escapeAttribute(unit)}">
+      <div class="interactive-head">
+        <div>
+          <div class="module-num">INTERACTIVE LAB</div>
+          <h3>${escapeHtml(cfg.title)}</h3>
+          <p>${escapeHtml(cfg.prompt)}</p>
+        </div>
+        <span class="interactive-state" id="${id}-state">Prediction first</span>
+      </div>
+      <div class="interactive-control">
+        <label for="${id}">${escapeHtml(cfg.control)} <strong id="${id}-value">${cfg.value}</strong></label>
+        <input id="${id}" type="range" min="${cfg.min}" max="${cfg.max}" step="${cfg.step}" value="${cfg.value}">
+      </div>
+      <div class="interactive-metrics" id="${id}-metrics"></div>
+      <div class="interactive-actions">
+        <button class="action secondary" type="button" data-m2-predict="${id}">Reveal measured behavior</button>
+        <button class="action secondary" type="button" data-m2-reset="${id}">Reset</button>
+      </div>
+      <p class="interactive-note">${escapeHtml(cfg.note)}</p>
+    </section>
+  `;
+}
+
+function bindModule02Interaction() {
+  $("[data-m2-interactive]").forEach((card) => {
+    const input = card.querySelector('input[type="range"]');
+    const metrics = card.querySelector(".interactive-metrics");
+    const stateLabel = card.querySelector(".interactive-state");
+    const predictButton = card.querySelector("[data-m2-predict]");
+    const resetButton = card.querySelector("[data-m2-reset]");
+    const unit = card.dataset.unit;
+    const configs = {
+      "Regression & Classification": {compute:(v)=>{const fit=.92-.055*Math.log1p(v), complexity=1/(1+v), calibration=Math.min(.98,.68+.24*Math.exp(-.45*Math.abs(v-1.8)));return {primary:fit,secondary:complexity,tertiary:calibration,labels:["Validation quality","Model flexibility","Calibration"]};}},
+      "Trees & Ensembles": {compute:(v)=>{const train=Math.min(.995,.55+.42*(1-Math.exp(-v/2.4))),general=Math.max(.58,.91-.018*Math.max(0,v-4)-.025*Math.max(0,2-v));return {primary:train,secondary:general,tertiary:Math.max(.05,1-Math.abs(v-5)/10),labels:["Training fit","Validation fit","Useful complexity"]};}},
+      "Unsupervised Learning": {compute:(v)=>{const stability=Math.max(.08,1-Math.abs(Math.log(v))*.38),separation=Math.min(.98,.72+.25*Math.exp(-Math.abs(v-1))),distortion=Math.min(.98,.2+.16*Math.abs(v-1));return {primary:stability,secondary:separation,tertiary:distortion,labels:["Assignment stability","Separation signal","Geometry distortion"]};}},
+      "Evaluation & Validation": {compute:(v)=>{const stability=.55+.42*(1-Math.exp(-v/3)),compute=Math.max(.1,1-(v-2)/10);return {primary:stability,secondary:compute,tertiary:1,labels:["Estimate stability","Relative compute efficiency","Protocol validity"]};}},
+      "ML Engineering Patterns": {compute:(v)=>{const performance=.62+.28*(1-Math.exp(-v/2.8)),reproducibility=Math.max(.55,.94-.025*v),diagnostic=Math.max(.2,.92-.04*Math.max(0,v-5));return {primary:performance,secondary:reproducibility,tertiary:diagnostic,labels:["Measured performance","Workflow reproducibility","Diagnostic clarity"]};}}
+    };
+    const cfg = configs[unit];
+    if (!cfg || !input || !metrics) return;
+    const render = (reveal=false) => {
+      const v = Number(input.value);
+      card.querySelector("#"+CSS.escape(input.id)+"-value").textContent = Number.isInteger(v) ? v : v.toFixed(1);
+      const result = cfg.compute(v);
+      metrics.innerHTML = result.labels.map((label,index) => {
+        const val = [result.primary,result.secondary,result.tertiary][index];
+        return '<div class="interactive-metric"><span>'+escapeHtml(label)+'</span><strong>'+Math.round(val*100)+'%</strong><i><b style="width:'+Math.round(val*100)+'%"></b></i></div>';
+      }).join("");
+      stateLabel.textContent = reveal ? "Measured behavior revealed" : "Prediction first";
+    };
+    input.addEventListener("input", () => render(false));
+    predictButton?.addEventListener("click", () => render(true));
+    resetButton?.addEventListener("click", () => { input.value = input.defaultValue; render(false); });
+    render(false);
+  });
+}
+
 function openLesson(lessonId) {
   const lesson = LESSONS.find((item) => item.id === lessonId);
 
@@ -286,7 +417,7 @@ function openLesson(lessonId) {
           ${dossierSection("Mathematical model", lesson.math)}
           ${dossierSection("Mechanism", lesson.mechanism)}
           ${lesson.workedExample ? dossierSection(lesson.workedExample.title, lesson.workedExample.text + " " + lesson.workedExample.steps.join(" ")) : ""}
-          ${lesson.secondExample ? dossierSection(lesson.secondExample.title, lesson.secondExample.text + " " + lesson.secondExample.steps.join(" ")) : ""}
+          ${lesson.secondExample ? dossierSection(lesson.secondExample.title, lesson.secondExample.text + " " + lesson.secondExample.steps.join(" ")) : ""}\n          ${module02Interaction(lesson)}
 
           <section class="dossier-section">
             <h3>Implementation</h3>
@@ -342,7 +473,7 @@ function openLesson(lessonId) {
     </div>
   `;
 
-  $("#completeBtn")?.addEventListener("click", () => {
+  bindModule02Interaction();\n\n  $("#completeBtn")?.addEventListener("click", () => {
     if (state.completed.has(lessonId)) {
       state.completed.delete(lessonId);
       save();
