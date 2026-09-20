@@ -37,6 +37,8 @@ jobs:
           node --check app.js
           node --check curriculum.js
           node --check module02.js
+          node --check module02-labs.js
+          node --check module02_labs_qa.js
           node --check module02_runtime_qa.js
           node --check learning-engine.js
           node --check learning-engine.test.js
@@ -51,6 +53,9 @@ jobs:
 
       - name: Run Module 02 runtime QA
         run: node module02_runtime_qa.js
+
+      - name: Run Module 02 labs QA
+        run: node module02_labs_qa.js
 
       - name: Run syntax primer QA
         run: node syntax_primer_qa.js
