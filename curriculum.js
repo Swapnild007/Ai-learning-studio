@@ -216,6 +216,120 @@ function buildLessons(){
   }
 
 
+  const stageSupport = {
+    Foundation: {
+      answers: [
+        "The key assumption is that the core objects and their meanings are understood before operations are applied. The invariant is that every object keeps a valid, explicitly tracked shape.",
+        "Your explanation is falsified if an example that satisfies the stated definitions consistently produces a different result. A shape prediction that contradicts the actual mathematical definition is also a warning that the mental model needs revision.",
+        "An engineer should be able to reproduce the example, explain every input and output, predict the shape before execution, and verify the result with an independent calculation or trusted reference."
+      ],
+      highlights: [
+        "Understand the object before memorizing the formula.",
+        "Shape and meaning are part of correctness.",
+        "Use a tiny example to test your understanding."
+      ],
+      notes: [
+        "Read each symbol as an object with a meaning.",
+        "Write the shape beside unfamiliar vectors, matrices or tensors.",
+        "If you cannot explain an example in plain language, pause before moving on."
+      ]
+    },
+    Derivation: {
+      answers: [
+        "The derivation assumes the definitions and algebraic rules used in the lesson are valid. The invariant is that each transformation preserves the meaning of the original expression.",
+        "A derivation is challenged when a valid input produces a contradiction, a dimension mismatch, or an algebraic step that cannot be justified from the preceding step.",
+        "Another engineer should be able to reproduce the derivation line by line, map symbols to concrete quantities, and verify the final result numerically on a small example."
+      ],
+      highlights: [
+        "Derive first, memorize later.",
+        "Every algebraic step needs a reason.",
+        "Use a small numerical example to verify the derivation."
+      ],
+      notes: [
+        "Keep dimensions visible while deriving matrix expressions.",
+        "Separate definitions from conclusions.",
+        "If one step feels like a jump, expand it into scalar operations."
+      ]
+    },
+    Implementation: {
+      answers: [
+        "The implementation assumes the mathematical specification is translated faithfully into code. The invariant is that the implementation produces the specified result for every valid input and rejects invalid inputs clearly.",
+        "A failing reference comparison, a violated shape contract, an edge-case failure, or a mismatch between the code and the derivation would falsify the current implementation.",
+        "Evidence includes tests, randomized comparisons with a trusted reference, explicit edge cases, and an explanation of why the implementation matches the mathematics."
+      ],
+      highlights: [
+        "Correctness comes before optimization.",
+        "Test normal cases and deliberately invalid cases.",
+        "Compare against an independent reference whenever possible."
+      ],
+      notes: [
+        "Keep the first implementation small enough to inspect.",
+        "Name variables according to their mathematical role.",
+        "Do not hide the core operation inside a library until you understand it."
+      ]
+    },
+    Engineering: {
+      answers: [
+        "The engineering invariant is that the system's stated contracts remain true while the workload runs. Examples include valid shapes, bounded memory, correct data separation, and expected output properties.",
+        "The explanation is falsified when measurements contradict the predicted failure mode, or when reproducing the same condition does not reproduce the symptom.",
+        "A convincing engineering result contains the symptom, hypothesis, diagnostic test, measured evidence, root cause, fix, and a regression test showing the failure does not return."
+      ],
+      highlights: [
+        "Debug the cause, not just the visible error.",
+        "Measure before changing the system.",
+        "A fix is incomplete without a regression test."
+      ],
+      notes: [
+        "Write down the first observable symptom.",
+        "Change one variable at a time during diagnosis.",
+        "Keep a record of failed hypotheses; they are useful evidence."
+      ]
+    },
+    Experiment: {
+      answers: [
+        "The experiment assumes the selected variable is the intended cause of the observed change and that other important variables are controlled. The protocol itself is an invariant across comparison conditions.",
+        "The hypothesis is weakened or falsified when the predicted effect is absent, reverses direction, disappears across repetitions, or can be explained by an uncontrolled variable.",
+        "Another engineer should have enough information to reproduce the setup, inputs, seeds, measurements and analysis without relying on undocumented choices."
+      ],
+      highlights: [
+        "Change one important variable deliberately.",
+        "Preserve the complete result set, including failures.",
+        "Separate observation from interpretation."
+      ],
+      notes: [
+        "Define the hypothesis before inspecting the result.",
+        "Keep seeds, versions and configuration recorded.",
+        "Report uncertainty and failed runs instead of hiding them."
+      ]
+    },
+    Research: {
+      answers: [
+        "A research question assumes a clearly defined mechanism or relationship that can be tested. The invariant is the experimental protocol: the comparison must remain fair enough to interpret the observed difference.",
+        "A result that consistently contradicts the prediction, or evidence showing that the effect disappears under a controlled condition, can falsify the hypothesis.",
+        "Strong evidence includes a reproducible protocol, baseline, raw measurements, multiple runs where appropriate, analysis, limitations, and a clear statement of what the evidence does and does not establish."
+      ],
+      highlights: [
+        "A good research question can be falsified.",
+        "Negative results are evidence, not failure.",
+        "Do not claim more than the experiment establishes."
+      ],
+      notes: [
+        "Define what result would change your mind before running the experiment.",
+        "Distinguish a measured effect from a causal explanation.",
+        "Always state the main limitation and the next experiment."
+      ]
+    }
+  };
+
+  const makeSupport = (profile, stage, stageSteps) => {
+    const support = stageSupport[stage];
+    return {
+      checkpointAnswers: support.answers.map((answer, index) => profile.stages[stage][index] ? answer + " In this lesson, apply that principle to: " + profile.stages[stage][index] : answer),
+      highlights: [...support.highlights, "Unit focus: " + profile.focus + "."],
+      keyNotes: [...support.notes, "Stage goal: " + stageSteps[0] + "."]
+    };
+  };
+
   let n=1;
   for(const module of CURRICULUM.modules){
     for(const [unit,scope] of module.units){
@@ -244,6 +358,7 @@ function buildLessons(){
           deliverable:profile ? stageInfo.deliverable : "A reproducible learning artifact with code, measurements and a written explanation.",
           code:profile ? "# "+stage+": "+unit+"\n# Build the smallest reproducible version.\nresult = run_experiment(seed=42)\nprint(result)" : "# Build the smallest reproducible experiment.\nresult = run_experiment(seed=42)\nprint(result)",
           ...authoredLessons["L"+String(n).padStart(3,"0")],
+          ...makeSupport(profile, stage, profile.stages[stage]),
           checkpoint:[
             "What assumption or invariant is this lesson testing?",
             "What observation would falsify your current explanation?",
