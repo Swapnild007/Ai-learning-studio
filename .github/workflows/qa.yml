@@ -51,6 +51,7 @@ jobs:
           node --check ui_shell_qa.cjs
           node --check ui-experience.js
           node --check ui_experience_qa.cjs
+          node --check curriculum_distribution_qa.cjs
 
       - name: Run learning engine tests
         run: node learning-engine.test.js
@@ -60,6 +61,9 @@ jobs:
 
       - name: Run curriculum runtime QA
         run: node curriculum_runtime_qa.js
+
+      - name: Run curriculum distribution QA
+        run: node curriculum_distribution_qa.cjs
 
       - name: Run Module 02 runtime QA
         run: node module02_runtime_qa.cjs
