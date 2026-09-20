@@ -205,6 +205,23 @@ function showModule(moduleId) {
         </div>
       </div>
 
+      ${module.masteryGate ? `
+        <section class="card" style="margin-bottom:16px">
+          <div class="module-num">MASTERY GATE</div>
+          <h3 style="margin:6px 0 8px">${escapeHtml(module.masteryGate.title)}</h3>
+          <p style="color:var(--muted);margin-top:0">${escapeHtml(module.masteryGate.deliverable)}</p>
+          <div class="dossier-section" style="margin-top:14px">
+            <h4 style="margin:0 0 8px">Evidence criteria</h4>
+            <ol class="checkpoint-list">
+              ${module.masteryGate.criteria.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+            </ol>
+          </div>
+          <div class="pill-row">
+            ${module.masteryGate.capabilities.map((item) => `<span class="pill">${escapeHtml(item)}</span>`).join("")}
+          </div>
+        </section>
+      ` : ""}
+
       <div class="lesson-list">
         ${lessons.map(lessonRow).join("")}
       </div>
@@ -297,7 +314,10 @@ function openLesson(lessonId) {
             </ol>
           </section>
 
-          ${dossierListSection("Checkpoint answers", lesson.checkpointAnswers, true)}
+          <details class="dossier-section checkpoint-answers">
+            <summary>Reveal checkpoint answers</summary>
+            ${dossierListSection("Checkpoint answers", lesson.checkpointAnswers, true)}
+          </details>
           ${dossierListSection("Highlights", lesson.highlights)}
           ${dossierListSection("Key notes", lesson.keyNotes)}
         </div>
