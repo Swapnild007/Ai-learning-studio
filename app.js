@@ -211,7 +211,7 @@ function showModule(moduleId) {
           <h3 style="margin:6px 0 8px">${escapeHtml(module.masteryGate.title)}</h3>
           <p style="color:var(--muted);margin-top:0">${escapeHtml(module.masteryGate.deliverable)}</p>
           <div class="dossier-section" style="margin-top:14px">
-            <h4 style="margin:0 0 8px">Evidence criteria</h4>
+            <h4 style="margin:0 0 8px">Mastery criteria</h4>
             <ol class="checkpoint-list">
               ${module.masteryGate.criteria.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
             </ol>
@@ -300,8 +300,8 @@ function openLesson(lessonId) {
           ${lesson.lab ? dossierSection(lesson.lab.title, lesson.lab.objective + " " + lesson.lab.steps.join(" ") + " Success condition: " + lesson.lab.success) : ""}
           ${dossierSection("Failure analysis", lesson.failure)}
           ${dossierListSection("Common misconceptions", lesson.misconceptions)}
-          ${dossierSection("Mastery evidence", lesson.evidence)}
-          ${dossierSection("Deliverable", lesson.deliverable)}
+          ${dossierSection("What demonstrates mastery", lesson.evidence)}
+          ${dossierSection("Expected output", lesson.deliverable)}
           ${lesson.takeaway ? dossierSection("Takeaway", lesson.takeaway) : ""}
           ${lesson.lessonBodyExtra ? dossierSection("Connecting to later ML", lesson.lessonBodyExtra) : ""}
 
@@ -328,8 +328,7 @@ function openLesson(lessonId) {
         <h3>${escapeHtml(lesson.unit)}</h3>
 
         <p style="color:var(--muted);font-size:12px;line-height:1.6">
-          Completion is only a progress signal. Future versions will require
-          demonstrated evidence for capability progression.
+          Completion is only a progress signal. Capability progression will be based on demonstrated work.
         </p>
 
         <button class="action" id="completeBtn">
@@ -423,7 +422,7 @@ function progressView() {
 
   layout(
     "Progress",
-    "Progress is a signal. Evidence will become the primary mastery record.",
+    "Progress is a signal. Demonstrated work will become the primary mastery record.",
     `
       <div class="card" style="padding:28px">
         <div class="metric-value">${percentage}%</div>
