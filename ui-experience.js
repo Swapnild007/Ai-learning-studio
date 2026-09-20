@@ -145,6 +145,14 @@
         return result;
       };
     }
+    const main = document.getElementById('main');
+    if (main) {
+      const observer = new MutationObserver(() => requestAnimationFrame(() => {
+        const view = typeof state !== 'undefined' ? state.view : 'home';
+        enhance(view);
+      }));
+      observer.observe(main, { childList: true, subtree: false });
+    }
     requestAnimationFrame(() => enhance(typeof state !== 'undefined' ? state.view : 'home'));
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install, {once:true}); else install();
