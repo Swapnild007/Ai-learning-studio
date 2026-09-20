@@ -41,3 +41,6 @@ jobs:
 
       - name: Run learning engine tests
         run: node learning-engine.test.js
+
+      - name: Run curriculum runtime QA
+        run: node curriculum_runtime_qa.js
