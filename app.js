@@ -642,6 +642,7 @@ function route(view) {
     home,
     learn,
     labs,
+    tools: aiTools,
     projects,
     progress: progressView
   };
@@ -661,9 +662,24 @@ function closeSearch() {
 }
 
 function updateActiveNavigation(activeButton) {
-  $$(".nav-item").forEach((button) => {
+  $(".nav-item").forEach((button) => {
     button.classList.toggle("active", button === activeButton);
   });
+
+  const nav = $(".sidebar nav");
+  if (!nav || !activeButton) return;
+
+  nav.style.setProperty("--liquid-x", activeButton.offsetLeft + "px");
+  nav.style.setProperty("--liquid-y", activeButton.offsetTop + "px");
+  nav.style.setProperty("--liquid-w", activeButton.offsetWidth + "px");
+  nav.style.setProperty("--liquid-h", activeButton.offsetHeight + "px");
+}
+
+function syncActiveNavigation(view) {
+  const activeButton = $(".nav-item").find(
+    (button) => button.dataset.view === view
+  );
+  updateActiveNavigation(activeButton);
 }
 
 function bindGlobalEvents() {
@@ -762,6 +778,10 @@ function bindGlobalEvents() {
 function initialize() {
   bindGlobalEvents();
   home();
+  requestAnimationFrame(() => syncActiveNavigation(state.view));
+  window.addEventListener("resize", () => {
+    syncActiveNavigation(state.view);
+  });
 }
 
 initialize();
