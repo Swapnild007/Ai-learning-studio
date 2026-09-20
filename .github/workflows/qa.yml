@@ -36,6 +36,8 @@ jobs:
         run: |
           node --check app.js
           node --check curriculum.js
+          node --check module02.js
+          node --check module02_runtime_qa.js
           node --check learning-engine.js
           node --check learning-engine.test.js
           node --check syntax-primer.js
@@ -46,6 +48,9 @@ jobs:
 
       - name: Run curriculum runtime QA
         run: node curriculum_runtime_qa.js
+
+      - name: Run Module 02 runtime QA
+        run: node module02_runtime_qa.js
 
       - name: Run syntax primer QA
         run: node syntax_primer_qa.js
