@@ -161,7 +161,7 @@
     Research:["A research claim must specify what is compared, under which assumptions, and what would count against it.","A consistent result opposite to the prediction, or disappearance under a controlled condition, can falsify it.","A strong result states what the evidence supports, what it does not establish, and what should be tested next."]
   };
 
-  const m2Lessons = LESSONS.filter(x => x.module === "m2");
+  const m2Lessons = LESSONS.filter(x => x.module === "m2" && !x.title.includes("· Practice ")).slice(0, 30);
   let i=0;
   for (const unit of Object.keys(P)) {
     const p=P[unit];
