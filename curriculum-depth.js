@@ -38,32 +38,65 @@ Engineering:u=>["Reproduce a realistic failure.","Instrument the relevant metric
 Experiment:u=>["Predeclare a hypothesis and primary metric.","Change one meaningful factor and repeat the measurement.","Separate observation, interpretation, uncertainty and limitation."],
 Research:u=>["Frame a falsifiable question with a meaningful baseline.","Define what result would disconfirm it and run the protocol.","Report negative results, threats to validity and the next experiment."]
 };
-const kind=["baseline transfer","edge-case transfer","scale transfer","ablation transfer","adversarial transfer","systems transfer","research transfer"];
+const kind=["baseline transfer","edge-case transfer","scale transfer","ablation transfer","adversarial transfer","systems transfer","research transfer"];\nconst CONCEPTS={
+"Regression & Classification":["Linear regression geometry","Loss functions and residuals","Logistic logits and probabilities","Regularization and feature scaling","Decision thresholds","Calibration","Imbalance and class-weighted learning"],
+"Trees & Ensembles":["Recursive partitioning","Gini and entropy","Pruning and depth","Bootstrap aggregation","Random feature selection","Boosting residuals","Feature importance and leakage"],
+"Unsupervised Learning":["K-means geometry","Initialization and local minima","Gaussian mixtures","EM responsibilities","PCA covariance","Dimensionality reduction","Cluster validation"],
+"Evaluation & Validation":["Train/validation/test roles","Metric selection","Confusion-matrix analysis","Cross-validation","Bootstrap uncertainty","Leakage detection","Slice and error analysis"],
+"ML Engineering Patterns":["Data contracts","Reproducible configuration","Feature pipelines","Artifact lineage","Experiment tracking","Train/serve parity","Drift and regression monitoring"],
+"Neural Network Foundations":["Affine layers","Activation functions","Loss gradients","Chain rule","Backpropagation","Initialization","Gradient diagnostics"],
+"Convolutional Learning":["Kernel geometry","Padding and stride","Receptive fields","Parameter sharing","Normalization","Augmentation","Visual error analysis"],
+"Sequence Models":["Hidden state","BPTT","Vanishing gradients","LSTM gates","Teacher forcing","Sequence batching","Exposure bias"],
+"Transformer Foundations":["Q/K/V projections","Scaled dot-product attention","Causal masking","Multi-head attention","Residual paths","Normalization","Attention complexity"],
+"Training Dynamics":["SGD dynamics","Momentum","Adam state","Learning-rate schedules","Regularization","Mixed precision","NaN and divergence diagnosis"],
+"Information Retrieval":["Inverted indexes","Dense embeddings","Similarity search","Candidate recall","Ranking functions","nDCG and recall@k","Reranking and latency"],
+"Reinforcement Learning":["MDP formulation","Bellman equations","TD learning","Q-learning","Policy gradients","Exploration","Reward design"],
+"Reasoning Systems":["Search trees","Candidate sampling","Self-consistency","Verifiers","Compute budgets","Termination","Reasoning evaluation"],
+"Distributed ML":["Data parallelism","Gradient synchronization","Tensor parallelism","Pipeline parallelism","Communication overlap","Stragglers","Distributed checkpointing"],
+"Multimodal AI":["Modality encoders","Projection spaces","Contrastive alignment","Cross-attention","Fusion strategies","Modality imbalance","Shortcut detection"],
+"LLM Architecture":["Tokenization","Embeddings","Self-attention","Position information","KV cache","Context windows","Autoregressive decoding"],
+"Pretraining & Adaptation":["Data mixture design","Next-token objective","Contamination controls","SFT","PEFT and LoRA","Catastrophic forgetting","Adaptation evaluation"],
+"Post-training":["Preference datasets","Reward modeling","RLHF","RLAIF","DPO","KL/reference policy","Reward hacking"],
+"RAG & Tool Use":["Chunking","Embedding retrieval","Reranking","Context assembly","Typed tools","Provenance","Bounded execution"],
+"Agent Evaluation & Safety":["Task success metrics","Episode traces","Prompt injection","Privilege boundaries","Tool misuse","Adversarial evaluation","Sandbox recovery"],
+"GPU & Inference Systems":["GPU execution model","Kernel launch overhead","Memory bandwidth","Arithmetic intensity","Quantization","Batching","Serving latency"],
+"Cloud & MLOps":["Containerization","CI validation","Artifact registries","Deployment strategies","Observability","Reproducibility","Rollback and drift"],
+"Performance Engineering":["Profiling","Latency percentiles","Throughput","Memory behavior","I/O bottlenecks","Amdahl reasoning","Benchmark hygiene"],
+"Research Engineering":["Hypothesis design","Baselines","Ablations","Seeds and variance","Experiment manifests","Negative results","Technical reporting"],
+"Portfolio & Interview Engineering":["System architecture","Complexity analysis","Testing","Benchmarking","Failure narratives","Trade-off reasoning","Reproducible demonstration"]
+};
+const conceptState={};
+
 for(const l of LESSONS||[]){
  if(l.module==="m1") continue;
  const p=P[l.unit]; if(!p) throw new Error("No depth profile for "+l.unit);
  const st=steps[l.stage](l.unit);
- l.lessonBody=p.c+" The learner must preserve the mechanism while changing one controlled condition ("+kind[l.order%kind.length]+").";
+ const conceptList=CONCEPTS[l.unit]; if(!conceptList) throw new Error("No concept map for "+l.unit);
+ const conceptIndex=conceptState[l.unit]||0;
+ const concept=conceptList[conceptIndex%conceptList.length];
+ conceptState[l.unit]=conceptIndex+1;
+ l.title=l.stage+" · "+concept;
+ l.lessonBody="Concept focus: "+concept+". "+p.c+" The learner must preserve the mechanism while changing one controlled condition ("+kind[l.order%kind.length]+").";
  l.mentalModel=[p.c,"Trace input → transformation → state → output → measurement.","Treat assumptions and failure boundaries as first-class model components."];
  l.vocabulary=[l.unit,"assumption","invariant","failure boundary","baseline","evidence"];
- l.math=p.m+" "+(l.stage==="Derivation"?"Map every symbol to the implementation and verify the algebra numerically.":"State which quantities are observed, optimized or constrained.");
- l.mechanism=p.c+" Trace the mechanism as input → transformation → intermediate state → output → measurement.";
- l.implementation=p.b+" Add assertions, a trusted-reference comparison and an adversarial case.";
- l.experiment=p.c+" Change one meaningful factor, freeze the baseline, repeat measurements and preserve raw results.";
- l.failure=p.f+" Root-cause sequence: reproduce → instrument → isolate → test alternatives → fix → regression test.";
- l.research="Form a falsifiable question about "+l.unit+", define a baseline and a disconfirming result, then report uncertainty, negative results and threats to validity.";
+ l.math="Concept: "+concept+". "+p.m+" "+(l.stage==="Derivation"?"Map every symbol to the implementation and verify the algebra numerically.":"State which quantities are observed, optimized or constrained.");
+ l.mechanism="Focus on "+concept+": "+p.c+" Trace the mechanism as input → transformation → intermediate state → output → measurement.";
+ l.implementation="Implement "+concept+". "+p.b+" Add assertions, a trusted-reference comparison and an adversarial case.";
+ l.experiment="Experiment on "+concept+". "+p.c+" Change one meaningful factor, freeze the baseline, repeat measurements and preserve raw results.";
+ l.failure="Failure analysis for "+concept+": "+p.f+" Root-cause sequence: reproduce → instrument → isolate → test alternatives → fix → regression test.";
+ l.research="Form a falsifiable question about "+concept+" within "+l.unit+", define a baseline and a disconfirming result, then report uncertainty, negative results and threats to validity.";
  l.stageSteps=st;
- l.workedExample={title:l.stage+" worked example — "+l.unit,text:p.c,steps:st};
- l.secondExample={title:"Failure-boundary example — "+l.unit,text:p.f,steps:["Freeze the baseline.","Change one relevant condition.","Predict the boundary behavior.","Measure and explain the result."]};
+ l.workedExample={title:l.stage+" worked example — "+concept,text:"Use "+concept+" as the concrete object of study. "+p.c,steps:st};
+ l.secondExample={title:"Failure-boundary example — "+concept,text:p.f,steps:["Freeze the baseline.","Change one relevant condition.","Predict the boundary behavior.","Measure and explain the result."]};
  l.practice=["Reconstruct the mechanism without copying the example.","Apply it to a new dataset, configuration or constraint.","Add a boundary/adversarial test.","Compare against baseline evidence.","Explain what remained invariant and what changed."];
  l.beginnerWarnings=["Do not hide assumptions behind defaults.","Do not change multiple variables when testing causality.","Do not treat one run as a stable result.","A passing demo is not proof of correctness."];
- l.lab={title:l.unit+" — "+l.stage+" deep lab",objective:"Build, break and measure the mechanism under a controlled change.",steps:["Create a reproducible baseline.","Apply the stage-specific intervention.","Capture measurements and failure traces.","Explain the result and limitation."],success:"Reproducible artifact, explicit invariant and evidence-backed conclusion."};
+ l.lab={title:concept+" — "+l.stage+" deep lab",objective:"Build, break and measure "+concept+" under a controlled change.",steps:["Create a reproducible baseline.","Apply the stage-specific intervention.","Capture measurements and failure traces.","Explain the result and limitation."],success:"Reproducible artifact, explicit invariant and evidence-backed conclusion."};
  l.misconceptions=["API usage is not the same as understanding.","A better aggregate metric does not prove every failure mode improved.","A surprising result must be investigated before being labeled a bug.","Changing assumptions can change the valid operating regime."];
  l.checkpoint=["What is the central mechanism or invariant?","What controlled change exposes its boundary?","What evidence would convince another engineer?"];
  l.checkpointAnswers=[p.c,p.f,"A reproducible baseline comparison with explicit measurements, assumptions and limitations."];
- l.highlights=[l.unit+" — mechanism before optimization.","Baseline → intervention → measurement → interpretation.","Failure boundaries are part of the concept.","Reproducibility is evidence."];
- l.keyNotes=["Define objects and assumptions before implementation.","Keep the evaluation protocol fixed while changing the intended variable.","Preserve unsuccessful runs.","Connect the lesson to the next stage."];
- l.evidence="Evidence must demonstrate the mechanism, controlled implementation or derivation, measured behavior, failure analysis and limitations.";
+ l.highlights=[concept+" — mechanism before optimization.","Baseline → intervention → measurement → interpretation.","Failure boundaries are part of the concept.","Reproducibility is evidence."];
+ l.keyNotes=["Concept focus: "+concept+".","Define objects and assumptions before implementation.","Keep the evaluation protocol fixed while changing the intended variable.","Preserve unsuccessful runs.","Connect the lesson to the next stage."];
+ l.evidence="Evidence for "+concept+" must demonstrate the mechanism, controlled implementation or derivation, measured behavior, failure analysis and limitations.";
  l.deliverable="Submit the artifact, tests, baseline comparison, failure analysis and concise technical note.";
 }
 globalThis.__CURRICULUM_DEPTH_AUDIT={profiles:Object.keys(P).length,enriched:LESSONS.filter(l=>l.module!=="m1").length};
