@@ -304,6 +304,181 @@ function buildLessons(){
   }
 };
 
+
+function module01Code(unit, stage) {
+  const snippets = {
+    "Linear Algebra": {
+      Foundation: `import numpy as np
+x = np.array([2.0, 3.0])
+w = np.array([0.5, 2.0])
+print("dot =", np.dot(x, w))
+print("shape:", x.shape)`,
+      Derivation: `import numpy as np
+x = np.array([2.0, 3.0])
+w = np.array([0.5, 2.0])
+dot = sum(x[i] * w[i] for i in range(len(x)))
+print("dot =", dot)`,
+      Implementation: `import numpy as np
+def matvec(A, x):
+    A = np.asarray(A, dtype=float)
+    x = np.asarray(x, dtype=float)
+    assert A.shape[1] == x.shape[0]
+    return np.array([sum(row[j] * x[j] for j in range(A.shape[1])) for row in A])
+print(matvec([[1., 2.], [3., 4.]], [2., 1.]))`,
+      Engineering: `import numpy as np
+A = np.array([[1., 2.], [3., 4.]])
+x = np.array([2., 1.])
+assert A.shape[1] == x.shape[0], "shape contract violated"
+print("A.shape =", A.shape, "x.shape =", x.shape)`,
+      Experiment: `import numpy as np
+for scale in [1., 10., 100.]:
+    A = np.diag([1., scale])
+    print({"scale": scale, "condition_number": np.linalg.cond(A)})`,
+      Research: `import numpy as np
+rng = np.random.default_rng(42)
+for noise in [1e-3, 1e-2, 1e-1]:
+    A = np.eye(3) + noise * rng.normal(size=(3, 3))
+    print({"noise": noise, "condition_number": np.linalg.cond(A)})`
+    },
+    "Probability & Statistics": {
+      Foundation: `import numpy as np
+sample = np.random.default_rng(42).binomial(1, 0.3, size=10000)
+print(sample.mean(), sample.var())`,
+      Derivation: `p = 0.3
+values = [0.0, 1.0]
+probs = [1-p, p]
+mean = sum(v*q for v, q in zip(values, probs))
+variance = sum(q * (v-mean)**2 for v, q in zip(values, probs))
+print(mean, variance)`,
+      Implementation: `import numpy as np
+def mean_and_variance(values):
+    x = np.asarray(values, dtype=float)
+    mean = x.mean()
+    variance = ((x - mean) ** 2).sum() / (len(x) - 1)
+    return mean, variance
+print(mean_and_variance([2, 4, 6, 8]))`,
+      Engineering: `import numpy as np
+rng = np.random.default_rng(42)
+train = rng.normal(size=100)
+test = rng.normal(size=50)
+print("Fit preprocessing statistics on train only:", train.mean(), train.std())`,
+      Experiment: `import numpy as np
+rng = np.random.default_rng(42)
+for n in [10, 100, 1000]:
+    means = [rng.normal(size=n).mean() for _ in range(200)]
+    print({"n": n, "std_of_means": np.std(means, ddof=1)})`,
+      Research: `import numpy as np
+for seed in [1, 2, 3, 4, 5]:
+    sample = np.random.default_rng(seed).normal(size=500)
+    print(seed, sample.mean(), sample.std(ddof=1))`
+    },
+    "Calculus & Optimization": {
+      Foundation: `def f(x): return (x - 3) ** 2
+for x in [1., 2., 3.]:
+    print(x, f(x))`,
+      Derivation: `def f(x): return x*x
+x = 2.0
+eps = 1e-5
+numerical = (f(x + eps) - f(x - eps)) / (2 * eps)
+analytical = 2 * x
+print(numerical, analytical)`,
+      Implementation: `def gradient(x): return 2 * (x - 3)
+x = 0.0
+for _ in range(100):
+    x -= 0.1 * gradient(x)
+print(x)`,
+      Engineering: `def gradient(x): return 2 * (x - 3)
+for lr in [0.01, 0.1, 1.1]:
+    x = 0.0
+    for _ in range(30): x -= lr * gradient(x)
+    print(lr, (x - 3) ** 2)`,
+      Experiment: `def train(lr):
+    x = 0.0
+    for _ in range(100): x -= lr * 2 * (x - 3)
+    return (x - 3) ** 2
+for lr in [0.001, 0.01, 0.1, 0.5]: print(lr, train(lr))`,
+      Research: `def train(lr, steps):
+    x = 0.0
+    for _ in range(steps): x -= lr * 2 * (x - 3)
+    return x
+for lr in [0.01, 0.05, 0.1]: print({"lr": lr, "final_x": train(lr, 50)})`
+    },
+    "Algorithms & Data Structures": {
+      Foundation: `values = [7, 2, 9, 4]
+print("found:", 9 in values)`,
+      Derivation: `def binary_search(values, target):
+    lo, hi = 0, len(values) - 1
+    while lo <= hi:
+        mid = (lo + hi) // 2
+        if values[mid] == target: return mid
+        if values[mid] < target: lo = mid + 1
+        else: hi = mid - 1
+    return -1
+print(binary_search([1, 3, 5, 7, 9], 7))`,
+      Implementation: `def top_k(values, k):
+    return sorted(values, reverse=True)[:k]
+print(top_k([4, 1, 9, 3, 7], 3))`,
+      Engineering: `def frequency(values):
+    counts = {}
+    for value in values: counts[value] = counts.get(value, 0) + 1
+    return counts
+print(frequency([1, 1, 2, 3, 3, 3]))`,
+      Experiment: `import time
+for n in [100, 1000, 10000]:
+    values = list(range(n))
+    start = time.perf_counter()
+    _ = n - 1 in values
+    print(n, time.perf_counter() - start)`,
+      Research: `import time
+for n in [1000, 10000, 100000]:
+    values = list(range(n))
+    start = time.perf_counter(); _ = n - 1 in values
+    linear = time.perf_counter() - start
+    lookup = set(values)
+    start = time.perf_counter(); _ = n - 1 in lookup
+    hashed = time.perf_counter() - start
+    print({"n": n, "list": linear, "set": hashed})`
+    },
+    "Systems Foundations": {
+      Foundation: `import os
+print("process:", os.getpid())
+print("cpu count:", os.cpu_count())`,
+      Derivation: `items = 1000
+bytes_per_item = 1024
+print("estimated MiB:", items * bytes_per_item / 2**20)`,
+      Implementation: `from queue import Queue
+from threading import Thread
+q = Queue()
+def producer():
+    for i in range(5): q.put(i)
+    q.put(None)
+Thread(target=producer).start()
+while True:
+    item = q.get()
+    if item is None: break
+    print(item)`,
+      Engineering: `import time
+for stage in ["load", "compute", "write"]:
+    start = time.perf_counter()
+    time.sleep(0.001)
+    print(stage, round(time.perf_counter() - start, 6))`,
+      Experiment: `import time
+for batch in [1, 8, 32, 128]:
+    start = time.perf_counter()
+    _ = [i*i for i in range(batch * 1000)]
+    print({"batch": batch, "seconds": time.perf_counter() - start})`,
+      Research: `import time
+results = []
+for batch in [1, 8, 32, 128]:
+    start = time.perf_counter()
+    _ = [i*i for i in range(batch * 1000)]
+    results.append((batch, time.perf_counter() - start))
+print(results)`
+    }
+  };
+  return snippets[unit]?.[stage] || "# No Module 01 scaffold defined.";
+}
+
   const authoredLessons = {};
   let authoredId = 1;
   for (const unit of Object.keys(M1_TEACHING)) {
@@ -349,7 +524,7 @@ function buildLessons(){
         takeaway: guide.takeaway + " " + profile.takeaway,
         lessonBodyExtra: "Module 01 follows one continuous progression: understand the concept, derive it, implement it, debug it, measure it, and investigate a falsifiable question.",
         stageSteps: steps,
-        code: guide.codePrefix + unit + "\n# Replace this scaffold with the smallest reproducible implementation.\nresult = run_experiment(seed=42)\nprint(result)",
+        code: guide.codePrefix + unit + "\n" + module01Code(unit, stage)",
         lessonTitle: stage + " · " + unit + " — " + guide.titleSuffix
       };
       authoredId++;
