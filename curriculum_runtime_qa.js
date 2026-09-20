@@ -15,8 +15,12 @@ const curriculum = context.__CURRICULUM;
 if (!Array.isArray(lessons)) throw new Error("LESSONS was not generated");
 if (lessons.length !== 520) throw new Error(`Expected 520 lessons, got ${lessons.length}`);
 
+const expectedCounts = { m1: 30, m2: 98, m3: 98, m4: 98, m5: 98, m6: 98 };
 for (const module of curriculum.modules) {
   const count = lessons.filter((lesson) => lesson.module === module.id).length;
+  if (count !== expectedCounts[module.id]) {
+    throw new Error(`Module ${module.id} expected ${expectedCounts[module.id]} lessons, got ${count}`);
+  }
   if (module.id === "m1" && count !== 30) {
     throw new Error(`Module 01 expected 30 lessons, got ${count}`);
   }
