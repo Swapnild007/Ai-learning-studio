@@ -761,6 +761,20 @@ function buildLessons(){
       nextOrder++;
     }
   }
+  // Normalize IDs and display order after expansion so each module occupies
+  // one contiguous global lesson range. This keeps lesson IDs intuitive:
+  // M01 L001-L030, M02 L031-L128, M03 L129-L226, M04 L227-L324,
+  // M05 L325-L422, M06 L423-L520.
+  let normalizedOrder = 1;
+  for (const module of CURRICULUM.modules) {
+    const moduleLessons = lessons.filter((lesson) => lesson.module === module.id);
+    for (const lesson of moduleLessons) {
+      lesson.id = "L" + String(normalizedOrder).padStart(3, "0");
+      lesson.order = normalizedOrder;
+      normalizedOrder++;
+    }
+  }
+
   // Hard invariants: never ship a partial curriculum.
   if (lessons.length !== CURRICULUM.meta.targetLessons) {
     throw new Error("Curriculum generation invariant failed: expected " + CURRICULUM.meta.targetLessons + " lessons, got " + lessons.length);
