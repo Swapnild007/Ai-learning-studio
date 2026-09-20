@@ -119,3 +119,5 @@ main{position:relative}
  .lesson-mode-bar{display:block}.lesson-mode-bar span{display:block}.lesson-mode-bar span+span{margin-top:4px;color:var(--muted);font-weight:600;letter-spacing:0}
 }
 @media(prefers-reduced-motion:reduce){.module-tile,.experience-progress .grid .card{animation:none}}
+
+.module-card-meta{display:flex;align-items:center;margin:4px 0 10px}.lesson-count{display:inline-flex;align-items:center;padding:6px 9px;border-radius:99px;background:rgba(237,244,255,.88);border:1px solid rgba(217,231,255,.92);color:#2459ad;font-size:9px;font-weight:800;letter-spacing:.04em}
