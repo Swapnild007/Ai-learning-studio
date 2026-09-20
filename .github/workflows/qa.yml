@@ -38,8 +38,8 @@ jobs:
           node --check curriculum.js
           node --check module02.js
           node --check module02-labs.js
-          node --check module02_labs_qa.js
-          node --check module02_runtime_qa.js
+          node --check module02_labs_qa.cjs
+          node --check module02_runtime_qa.cjs
           node --check learning-engine.js
           node --check learning-engine.test.js
           node --check syntax-primer.js
@@ -52,10 +52,10 @@ jobs:
         run: node curriculum_runtime_qa.js
 
       - name: Run Module 02 runtime QA
-        run: node module02_runtime_qa.js
+        run: node module02_runtime_qa.cjs
 
       - name: Run Module 02 labs QA
-        run: node module02_labs_qa.js
+        run: node module02_labs_qa.cjs
 
       - name: Run syntax primer QA
         run: node syntax_primer_qa.js
