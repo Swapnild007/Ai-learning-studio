@@ -814,7 +814,7 @@ function bindGlobalEvents() {
     menuButton?.setAttribute("aria-label", open ? "Close navigation" : "Open navigation");
   };
 
-  $(".nav-item").forEach((button) => {
+  $$(".nav-item").forEach((button) => {
     button.addEventListener("click", () => {
       route(button.dataset.view);
       setMenuOpen(false);
