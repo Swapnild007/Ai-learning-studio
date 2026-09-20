@@ -351,7 +351,9 @@ function openLesson(lessonId) {
     </div>
   `;
 
-  bindModule02Interaction();\n\n  $("#completeBtn")?.addEventListener("click", () => {
+  bindModule02Interaction();
+
+  $("#completeBtn")?.addEventListener("click", () => {
     if (state.completed.has(lessonId)) {
       state.completed.delete(lessonId);
       save();
