@@ -546,6 +546,202 @@ function buildLessons(){
    * distributed across Modules 02-06 so generated practice records retain
    * their source module identity.
    */
+
+  /*
+   * Deep practice layer.
+   * Generated lessons are complete learning objects, not title-only clones.
+   */
+  const DEEP_KINDS = [
+    ["Transfer Case", "Move the concept to a new dataset, task or constraint."],
+    ["Diagnostic Case", "Start from a broken result and isolate the violated assumption or invariant."],
+    ["Scale Case", "Increase workload, model size, sequence length or data volume and find the new bottleneck."],
+    ["Ablation Case", "Remove one component while keeping the protocol fixed."],
+    ["Adversarial Case", "Construct an input that exposes a known weakness and measure the failure."],
+    ["Systems Case", "Connect the concept to latency, memory, throughput, reproducibility or cost."],
+    ["Research Case", "Turn the concept into a falsifiable question with a baseline."]
+  ];
+
+  const DEEP_TASKS = {
+    Foundation: [
+      "Identify the core objects and assumptions before using a library abstraction.",
+      "Predict one observable behavior from the mental model.",
+      "State one boundary where the method should not be used."
+    ],
+    Derivation: [
+      "Derive the central relationship from definitions with dimensions or units visible.",
+      "Verify the derivation on a tiny numerical example.",
+      "State the assumption that makes the derivation valid."
+    ],
+    Implementation: [
+      "Implement the smallest correct version before optimizing.",
+      "Test normal, edge and adversarial inputs explicitly.",
+      "Compare at least one result with an independent reference."
+    ],
+    Engineering: [
+      "Reproduce the failure before changing the system.",
+      "Instrument the relevant invariant, resource or metric.",
+      "Finish with a regression test."
+    ],
+    Experiment: [
+      "Define the hypothesis and primary metric before running the experiment.",
+      "Change one meaningful variable and preserve every run.",
+      "Separate observation from interpretation and limitations."
+    ],
+    Research: [
+      "Define a falsifiable question and meaningful baseline.",
+      "Specify what result would change the conclusion.",
+      "Report uncertainty, negative results and the next experiment."
+    ]
+  };
+
+  function deepenPractice(source, practiceIndex, order) {
+    const kind = DEEP_KINDS[practiceIndex % DEEP_KINDS.length];
+    const tasks = DEEP_TASKS[source.stage] || DEEP_TASKS.Foundation;
+    const examples = Array.isArray(source.workedExample)
+      ? source.workedExample
+      : [source.workedExample, source.secondExample].filter(Boolean);
+
+    return {
+      ...source,
+      id: "L" + String(order).padStart(3, "0"),
+      order,
+      title: source.stage + " · " + source.unit + " · " + kind[0] + " " + (Math.floor(practiceIndex / DEEP_KINDS.length) + 1),
+      objective:
+        kind[1] +
+        " Preserve the core mechanism, identify the invariant, change one controlled condition, and prove the result with evidence.",
+      lessonBody:
+        "Transfer protocol: restate the baseline mechanism, identify its assumptions, change one condition, predict the consequence, then verify the prediction.",
+      math:
+        source.math +
+        " For this transfer, write the baseline relationship first and identify exactly which variable, term or assumption changes.",
+      mechanism:
+        source.mechanism +
+        " Transfer path: baseline assumption → changed condition → prediction → measurement → interpretation.",
+      implementation:
+        source.implementation +
+        " Add an explicit assertion or validation check for the invariant.",
+      experiment:
+        source.experiment +
+        " Compare the changed condition with the baseline using the same primary metric and preserve unsuccessful runs.",
+      failure:
+        source.failure +
+        " Also test whether the changed context violates an assumption that was harmless in the baseline.",
+      evidence:
+        "Demonstrate transfer rather than repetition: explain the invariant, implement or derive the changed case, measure the outcome, and identify the failure boundary.",
+      deliverable:
+        "A complete " + kind[0].toLowerCase() +
+        " artifact containing baseline, changed condition, implementation or derivation, measurements, interpretation and limitations.",
+      workedExample: {
+        title: "Transfer walkthrough",
+        text: examples[0]?.text || source.scope,
+        steps: [
+          "Write the original assumptions and expected behavior.",
+          "Identify the one condition being changed.",
+          "Predict the direction of the effect.",
+          "Run the smallest reproducible case and compare."
+        ]
+      },
+      secondExample: {
+        title: "Failure-first walkthrough",
+        text: examples[1]?.text || source.scope,
+        steps: [
+          "Construct the smallest case that could expose the failure.",
+          "Measure the symptom before applying a fix.",
+          "Test competing explanations.",
+          "Apply the fix and prove the failure no longer reproduces."
+        ]
+      },
+      practice: [
+        kind[1],
+        ...tasks,
+        "State the baseline before changing it.",
+        "Record at least one negative or unexpected result.",
+        "Explain which part of the original mental model survived the transfer."
+      ],
+      beginnerWarnings: [
+        "Do not copy the baseline result and call it evidence for the new condition.",
+        "Do not change several variables at once unless interaction effects are the subject.",
+        "Do not treat a passing implementation as proof that the experimental question was valid.",
+        "Keep assumptions visible while debugging."
+      ],
+      lab: {
+        title: kind[0] + " Lab",
+        objective: "Test whether " + source.unit + " transfers to a changed condition.",
+        steps: [
+          "Freeze the baseline.",
+          "Change one meaningful condition.",
+          "Collect repeated measurements or a complete derivation trace.",
+          "Explain the result, failure boundary and limitation."
+        ],
+        success: "The changed case is reproducible, the invariant is explicit, and the conclusion is supported by recorded evidence."
+      },
+      misconceptions: [
+        ...(Array.isArray(source.misconceptions) ? source.misconceptions : []),
+        "Transfer is not repetition: the changed condition must create a new reasoning problem.",
+        "A surprising result is not automatically an error; test the hypothesis first."
+      ],
+      takeaway:
+        "The transferable skill is recognizing the invariant behind " +
+        source.unit +
+        " and knowing when a changed context breaks an assumption.",
+      lessonBodyExtra:
+        "This transfer connects the lesson to later engineering and research work: the same concept must survive new data, constraints, scale and failure modes.",
+      stageSteps: tasks,
+      checkpoint: [
+        "What changed relative to the baseline?",
+        "Which assumption or invariant should remain true?",
+        "What evidence would show that the transfer failed?"
+      ],
+      checkpointAnswers: [
+        "The deliberate intervention is: " + kind[1],
+        "The invariant is the core mechanism or contract established by the baseline lesson.",
+        "A reproducible violation of the predicted behavior under controlled conditions would show that the transfer assumption was invalid."
+      ],
+      highlights: [
+        kind[0] + ": change context without losing the concept.",
+        "Baseline first; interpretation second.",
+        "A failed transfer is useful evidence.",
+        "Preserve negative results."
+      ],
+      keyNotes: [
+        "Do not reuse the original result as evidence.",
+        "Preserve the changed configuration.",
+        "Explain what remained invariant and what did not."
+      ]
+    };
+  }
+
+  // Add missing instructional depth to authored lessons outside frozen Module 01.
+  for (let i = 0; i < base.length; i++) {
+    if (base[i].module !== "m1") {
+      const lesson = base[i];
+      const tasks = DEEP_TASKS[lesson.stage] || DEEP_TASKS.Foundation;
+      lesson.lessonBody = lesson.lessonBody || "Start with the objects, assumptions and observable behavior before using a library abstraction.";
+      lesson.mentalModel = lesson.mentalModel || [
+        "Identify objects and assumptions before manipulating them.",
+        "Trace the mechanism from input to observable output.",
+        "Treat failure modes as evidence about the model."
+      ];
+      lesson.vocabulary = lesson.vocabulary || [
+        lesson.unit + " = the technical domain under study.",
+        "Assumption = a condition required for validity.",
+        "Invariant = a property that should remain true.",
+        "Failure mode = an observable violation of expected behavior."
+      ];
+      lesson.workedExample = lesson.workedExample || {title:"Worked example", text:lesson.scope, steps:tasks};
+      lesson.secondExample = lesson.secondExample || {title:"Second example", text:"Apply the same mechanism under a changed condition.", steps:tasks};
+      lesson.practice = lesson.practice || tasks;
+      lesson.beginnerWarnings = lesson.beginnerWarnings || ["Do not skip assumptions.","Do not treat execution success as proof of correctness.","Measure before interpreting."];
+      lesson.lab = lesson.lab || {title:lesson.stage + " lab", objective:"Investigate " + lesson.unit + " under a controlled condition.", steps:tasks, success:"Reproducible evidence with explicit assumptions and limitations."};
+      lesson.misconceptions = lesson.misconceptions || ["A correct-looking output can still come from an invalid protocol.","Changing multiple variables makes causal interpretation difficult."];
+      lesson.checkpoint = lesson.checkpoint || ["What assumption or invariant is central?","What observation would falsify your explanation?","What evidence would convince another engineer?"];
+      lesson.checkpointAnswers = lesson.checkpointAnswers || ["The central invariant is the stated mathematical or system contract.","A reproducible contradiction under a controlled test would falsify the explanation.","Convincing evidence requires reproducibility, appropriate measurements and explicit limitations."];
+      lesson.highlights = lesson.highlights || ["Understand the mechanism before optimizing.","Use controlled evidence.","Keep failure analysis explicit."];
+      lesson.keyNotes = lesson.keyNotes || ["Write assumptions before implementation.","Separate observation from interpretation.","Preserve reproducibility information."];
+      lessons[i] = lesson;
+    }
+  }
+
   // Deterministic capacity fill: each module has an explicit final target.
   // This avoids any dependence on cursor state or source-pool size.
   const targetCounts = { m1: 30, m2: 98, m3: 98, m4: 98, m5: 98, m6: 98 };
@@ -559,14 +755,7 @@ function buildLessons(){
     let copyIndex = 0;
     while (current < targetCounts[module.id]) {
       const source = pool[copyIndex % pool.length];
-      lessons.push({
-        ...source,
-        id: "L" + String(nextOrder).padStart(3, "0"),
-        order: nextOrder,
-        title: source.title + " · Practice " + (Math.floor(copyIndex / pool.length) + 1),
-        evidence: "Transfer the same concept to a new dataset, constraint or failure mode.",
-        deliverable: "A transfer artifact with evidence showing what changed and what remained invariant."
-      });
+      lessons.push(deepenPractice(source, copyIndex, nextOrder));
       current++;
       copyIndex++;
       nextOrder++;
