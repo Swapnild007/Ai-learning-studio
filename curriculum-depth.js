@@ -89,7 +89,8 @@ const AI_TOOLS=[
  {id:"weights-biases",name:"Weights & Biases",category:"ML Experimentation",skills:["experiment tracking","artifacts","sweeps"],mission:"Track an experiment family and prove which configuration produced the reported result."}
 ];
 globalThis.AI_TOOLS=AI_TOOLS;
-const kind=["baseline transfer","edge-case transfer","scale transfer","ablation transfer","adversarial transfer","systems transfer","research transfer"];\nconst CONCEPTS={
+const kind=["baseline transfer","edge-case transfer","scale transfer","ablation transfer","adversarial transfer","systems transfer","research transfer"];
+const CONCEPTS={
 "Regression & Classification":["Linear regression geometry","Loss functions and residuals","Logistic logits and probabilities","Regularization and feature scaling","Decision thresholds","Calibration","Imbalance and class-weighted learning"],
 "Trees & Ensembles":["Recursive partitioning","Gini and entropy","Pruning and depth","Bootstrap aggregation","Random feature selection","Boosting residuals","Feature importance and leakage"],
 "Unsupervised Learning":["K-means geometry","Initialization and local minima","Gaussian mixtures","EM responsibilities","PCA covariance","Dimensionality reduction","Cluster validation"],
