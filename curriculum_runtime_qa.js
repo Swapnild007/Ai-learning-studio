@@ -1,0 +1,37 @@
+const fs = require("fs");
+const vm = require("vm");
+
+const source = fs.readFileSync("curriculum.js", "utf8");
+const context = {};
+vm.runInNewContext(
+  source + "\n;globalThis.__LESSONS = LESSONS; globalThis.__CURRICULUM = CURRICULUM;",
+  context,
+  { filename: "curriculum.js" }
+);
+
+const lessons = context.__LESSONS;
+const curriculum = context.__CURRICULUM;
+
+if (!Array.isArray(lessons)) throw new Error("LESSONS was not generated");
+if (lessons.length !== 520) throw new Error(`Expected 520 lessons, got ${lessons.length}`);
+
+for (const module of curriculum.modules) {
+  const count = lessons.filter((lesson) => lesson.module === module.id).length;
+  if (module.id === "m1" && count !== 30) {
+    throw new Error(`Module 01 expected 30 lessons, got ${count}`);
+  }
+}
+
+for (const lesson of lessons) {
+  if (!Array.isArray(lesson.checkpoint) || lesson.checkpoint.length !== 3) {
+    throw new Error(`${lesson.id}: checkpoint missing or incomplete`);
+  }
+  for (const field of ["checkpointAnswers", "highlights", "keyNotes"]) {
+    if (!Array.isArray(lesson[field]) || lesson[field].length === 0) {
+      throw new Error(`${lesson.id}: ${field} missing`);
+    }
+  }
+}
+
+console.log("Curriculum runtime QA PASS");
+console.log(`Lessons: ${lessons.length}; Module 01: ${lessons.filter((l) => l.module === "m1").length}`);
