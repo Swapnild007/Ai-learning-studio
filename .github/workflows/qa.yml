@@ -39,6 +39,7 @@ jobs:
           node --check module02.js
           node --check module02-labs.js
           node --check module02_labs_qa.cjs
+          node --check module02_content_audit.cjs
           node --check module02_runtime_qa.cjs
           node --check learning-engine.js
           node --check learning-engine.test.js
@@ -56,6 +57,9 @@ jobs:
 
       - name: Run Module 02 labs QA
         run: node module02_labs_qa.cjs
+
+      - name: Run Module 02 content accuracy audit
+        run: node module02_content_audit.cjs
 
       - name: Run syntax primer QA
         run: node syntax_primer_qa.js
