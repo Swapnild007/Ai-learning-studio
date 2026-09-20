@@ -329,8 +329,8 @@ function buildLessons(){
     };
     return {
       checkpointAnswers: support.answers.map((answer, index) =>
-        safeProfile.stages[stage]?.[index]
-          ? answer + " In this lesson, apply that principle to: " + safeProfile.stages[stage][index]
+        stageSteps?.[index]
+          ? answer + " In this lesson, apply that principle to: " + stageSteps[index]
           : answer
       ),
       highlights: [...support.highlights, "Unit focus: " + safeProfile.focus + "."],
@@ -366,7 +366,7 @@ function buildLessons(){
           deliverable:profile ? stageInfo.deliverable : "A reproducible learning artifact with code, measurements and a written explanation.",
           code:profile ? "# "+stage+": "+unit+"\n# Build the smallest reproducible version.\nresult = run_experiment(seed=42)\nprint(result)" : "# Build the smallest reproducible experiment.\nresult = run_experiment(seed=42)\nprint(result)",
           ...authoredLessons["L"+String(n).padStart(3,"0")],
-          ...makeSupport(profile, stage, profile.stages[stage]),
+          ...makeSupport(profile, stage, module.id==="m1" ? M1_TEACHING[unit].stages[stage] : []),
           checkpoint:[
             "What assumption or invariant is this lesson testing?",
             "What observation would falsify your current explanation?",
