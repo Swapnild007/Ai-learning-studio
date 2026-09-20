@@ -88,49 +88,83 @@ function buildLessons(){
   const lessons=[], base=[];
   const authoredLessons = {
     L001: {
-      lessonBody: "Linear algebra is the language used to represent data, parameters and transformations in machine learning. The first discipline is not memorizing matrix notation. It is learning to reason about what an object represents, what shape it has, what operation is being performed, and what the result means. A feature vector can represent one observation, a matrix can represent a dataset or a transformation, and a weight vector can turn features into a prediction. Once these relationships are explicit, later topics such as linear regression, PCA, neural-network layers and attention become much easier to inspect rather than merely memorize.",
+      lessonBody: "If you are completely new to Linear Algebra, start with one simple idea: machine learning works with numbers, and Linear Algebra gives us a clean way to organize and transform those numbers. A single person, image, sentence or transaction can be represented as numbers. A vector is one ordered list of those numbers. A matrix is a collection of such numbers arranged in rows and columns. When you understand what the numbers represent and how their shapes fit together, many ML equations stop looking mysterious.",
+      whyItMatters: "You will see vectors and matrices everywhere in AI: model weights, datasets, embeddings, images, neural-network layers and gradients. You do not need to memorize advanced mathematics first. Your first goal is to become comfortable reading the objects, their shapes and the operation being performed.",
       mentalModel: [
-        "A vector is an ordered collection of numbers. In ML, one vector can represent one example, one parameter set, one embedding, or one gradient.",
-        "A matrix is a rectangular arrangement of numbers. It can represent many examples at once or a transformation from one coordinate space to another.",
-        "Matrix multiplication is not arbitrary multiplication. It composes weighted sums and therefore represents a structured transformation.",
-        "Shape is a contract. If A has shape (m,n) and x has shape (n,), Ax has shape (m,). A mismatch is not a cosmetic error: it means the mathematical operation is undefined."
+        "Scalar = one number, such as 5.",
+        "Vector = an ordered list of numbers, such as [2, 3, 4]. Think of it as one row of measurements or one point described by several features.",
+        "Matrix = numbers arranged in rows and columns. Think of a spreadsheet: rows can represent examples and columns can represent features.",
+        "Shape = the size of the object. A vector [2,3,4] has 3 values. A matrix with 3 rows and 2 columns has shape (3,2).",
+        "Operation = an instruction that transforms numbers. Matrix multiplication is a structured operation, not simply multiplying every number by another number."
+      ],
+      vocabulary: [
+        "Scalar: a single number.",
+        "Vector: an ordered one-dimensional collection of numbers.",
+        "Dimension: how many values are inside a vector.",
+        "Matrix: a rectangular grid of numbers.",
+        "Row: numbers running horizontally across a matrix.",
+        "Column: numbers running vertically down a matrix.",
+        "Transpose: swap rows and columns.",
+        "Dot product: multiply corresponding vector values and add the results."
       ],
       workedExample: {
-        title: "Worked example: a two-feature prediction",
-        text: "Suppose one observation is x = [2, 3] and the model weights are w = [0.5, 2]. The dot product is x·w = 2(0.5) + 3(2) = 7. The same computation can be written as a 1×2 matrix multiplied by a 2×1 vector. The scalar calculation and the matrix calculation are the same operation expressed at different levels of abstraction.",
+        title: "Worked example: understanding a vector",
+        text: "Imagine a student is described by three measurements: study hours = 2, practice tests = 3, and projects completed = 4. We can represent that student as x = [2, 3, 4]. The vector is not just three random numbers. Each position has a meaning. This idea is critical in ML because changing the order of features changes what the model receives.",
         steps: [
-          "Write the feature vector x with two features.",
-          "Write the parameter vector w with one weight per feature.",
-          "Multiply corresponding entries: 2×0.5 and 3×2.",
-          "Add the products to obtain the prediction contribution, 7.",
-          "Check the dimensions before multiplying: (1×2)(2×1) → (1×1)."
+          "Position 1 represents study hours.",
+          "Position 2 represents practice tests.",
+          "Position 3 represents projects completed.",
+          "The vector therefore has dimension 3 and shape (3,).",
+          "If another vector stores weights for these three features, it must also contain three compatible values."
+        ]
+      },
+      secondExample: {
+        title: "Worked example: the dot product",
+        text: "Suppose x = [2, 3] and weights w = [0.5, 2]. Multiply matching positions: 2×0.5 = 1 and 3×2 = 6. Then add them: 1 + 6 = 7. The dot product is therefore 7. In a simple linear model, this calculation is one of the building blocks used to produce a prediction.",
+        steps: [
+          "Match the first feature with the first weight.",
+          "Match the second feature with the second weight.",
+          "Multiply each matching pair.",
+          "Add the products.",
+          "Check that both vectors have the same dimension before calculating."
         ]
       },
       practice: [
-        "For A with shape (3,4) and x with shape (4,), predict the shape of Ax before calculating anything.",
-        "For x=[1,2,4] and w=[3,-1,0.5], calculate x·w by hand.",
-        "Explain in one sentence why (3×4)(3,) is invalid.",
-        "Write a test that deliberately passes a vector with the wrong number of features."
+        "Write a vector representing a person with age, height and weekly study hours. Give each position a clear meaning.",
+        "For x=[1,2,4] and w=[3,-1,0.5], calculate the dot product by hand.",
+        "For a matrix with 3 rows and 4 columns, write its shape as (3,4).",
+        "For A with shape (3,4) and x with shape (4,), predict the shape of Ax before calculating it.",
+        "Explain in your own words why a vector with 3 values cannot be directly used where 4 values are required."
+      ],
+      beginnerWarnings: [
+        "Do not try to memorize every formula on the first reading. First understand what each object represents.",
+        "Do not confuse the number of rows with the number of columns.",
+        "Do not assume every multiplication symbol means matrix multiplication.",
+        "Always ask: What does this number represent? What is its shape? What operation are we performing?",
+        "When code gives a shape error, return to the mathematics instead of changing dimensions randomly until the error disappears."
       ],
       lab: {
-        title: "Shape contract lab",
-        objective: "Build a tiny matrix-vector function and make its shape contract explicit.",
+        title: "Beginner lab: build your first matrix-vector multiplication",
+        objective: "Turn the mathematical idea into a tiny Python implementation without hiding the important steps behind a library.",
         steps: [
-          "Create a 3×2 matrix and a length-2 vector.",
-          "Implement matrix-vector multiplication using nested loops.",
-          "Add an assertion that every row has the same length as the vector.",
-          "Compare your result with NumPy on at least ten random inputs.",
-          "Add one failing test using a length-3 vector and explain the failure."
+          "Create a 2×3 matrix A and a length-3 vector x.",
+          "Take the first row of A and calculate its dot product with x.",
+          "Repeat the same process for the second row.",
+          "Store the two results in a new vector.",
+          "Compare your result with NumPy.",
+          "Change x to a length-2 vector and observe the failure. Explain why the operation is mathematically invalid."
         ],
-        success: "The implementation agrees with the reference within floating-point tolerance and rejects invalid shapes with a clear diagnostic."
+        success: "You can explain the calculation without looking at the code, the implementation agrees with a reference implementation, and you can explain the shape error rather than simply fixing it by trial and error."
       },
       misconceptions: [
-        "Elementwise multiplication and matrix multiplication are different operations.",
-        "A transpose changes orientation and therefore changes which dimensions can legally multiply.",
-        "Broadcasting can make code execute even when the intended mathematical operation was wrong.",
-        "Exact floating-point equality is usually the wrong correctness criterion for numerical implementations."
+        "A vector is not merely a bag of numbers. Position and meaning matter.",
+        "A matrix is not automatically a dataset. It can also represent a transformation or parameters.",
+        "Matrix multiplication and elementwise multiplication answer different mathematical questions.",
+        "A program running without an error does not prove that the mathematical operation is correct.",
+        "Advanced notation becomes easier after the underlying objects are familiar."
       ],
-      takeaway: "Before calculating, identify what every number represents and write down the shape of every object. This habit becomes a debugging tool for regression, neural networks, transformers and distributed tensors."
+      takeaway: "Your first Linear Algebra skill is not calculation speed. It is the habit of identifying the object, its meaning, its shape and the operation being performed. That habit will later help you understand regression, neural networks, embeddings, attention and gradient calculations.",
+      lessonBodyExtra: "When you reach a formula such as y = Wx + b later in the course, do not treat it as a new language. Read it as a sequence of familiar objects: W is a matrix, x is a vector, Wx is a matrix-vector operation, b is another vector, and y is the resulting output. The goal of this lesson is to make that reading feel natural."
     }
   };
 
