@@ -36,6 +36,7 @@ jobs:
         run: |
           node --check app.js
           node --check curriculum.js
+          node --check curriculum-depth.js
           node --check module02.js
           node --check module02-labs.js
           node --check module02_labs_qa.cjs
