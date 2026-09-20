@@ -85,7 +85,8 @@ const STAGE_DETAIL = {
 
 function buildLessons(){
   const stages=["Foundation","Derivation","Implementation","Engineering","Experiment","Research"];
-  const lessons=[], base=[];\n  const authoredLessons = {
+  const lessons=[], base=[];
+  const authoredLessons = {
     L001: {
       lessonBody: "Linear algebra is the language used to represent data, parameters and transformations in machine learning. The first discipline is not memorizing matrix notation. It is learning to reason about what an object represents, what shape it has, what operation is being performed, and what the result means. A feature vector can represent one observation, a matrix can represent a dataset or a transformation, and a weight vector can turn features into a prediction. Once these relationships are explicit, later topics such as linear regression, PCA, neural-network layers and attention become much easier to inspect rather than merely memorize.",
       mentalModel: [
