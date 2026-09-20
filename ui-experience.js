@@ -145,15 +145,24 @@
         return result;
       };
     }
+    const detectView = () => {
+      const main = document.getElementById('main');
+      if (!main) return 'home';
+      if (main.querySelector('.reader')) return 'lesson';
+      if (main.querySelector('.lesson-list')) return 'module';
+      if (main.querySelector('.tool-workbench')) return 'tools';
+      if (main.querySelector('.knowledge-map')) return 'learn';
+      if (main.querySelector('.home-signal-grid')) return 'home';
+      return typeof state !== 'undefined' ? state.view : 'home';
+    };
     const main = document.getElementById('main');
     if (main) {
       const observer = new MutationObserver(() => requestAnimationFrame(() => {
-        const view = typeof state !== 'undefined' ? state.view : 'home';
-        enhance(view);
+        enhance(detectView());
       }));
       observer.observe(main, { childList: true, subtree: false });
     }
-    requestAnimationFrame(() => enhance(typeof state !== 'undefined' ? state.view : 'home'));
+    requestAnimationFrame(() => enhance(detectView()));
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', install, {once:true}); else install();
 })();
