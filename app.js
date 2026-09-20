@@ -262,8 +262,11 @@ function openLesson(lessonId) {
 
         <div class="dossier">
           ${dossierSection("Prerequisites", lesson.prerequisite)}
+          ${lesson.lessonBody ? dossierSection("Lesson", lesson.lessonBody) : ""}
+          ${dossierListSection("Mental model", lesson.mentalModel)}
           ${dossierSection("Mathematical model", lesson.math)}
           ${dossierSection("Mechanism", lesson.mechanism)}
+          ${lesson.workedExample ? dossierSection(lesson.workedExample.title, lesson.workedExample.text + " " + lesson.workedExample.steps.join(" ")) : ""}
 
           <section class="dossier-section">
             <h3>Implementation</h3>
@@ -271,10 +274,14 @@ function openLesson(lessonId) {
             <pre class="code">${escapeHtml(lesson.code)}</pre>
           </section>
 
+          ${dossierListSection("Practice before you code", lesson.practice, true)}
           ${dossierSection("Experiment", lesson.experiment)}
+          ${lesson.lab ? dossierSection(lesson.lab.title, lesson.lab.objective + " " + lesson.lab.steps.join(" ") + " Success condition: " + lesson.lab.success) : ""}
           ${dossierSection("Failure analysis", lesson.failure)}
+          ${dossierListSection("Common misconceptions", lesson.misconceptions)}
           ${dossierSection("Mastery evidence", lesson.evidence)}
           ${dossierSection("Deliverable", lesson.deliverable)}
+          ${lesson.takeaway ? dossierSection("Takeaway", lesson.takeaway) : ""}
 
           <section class="dossier-section">
             <h3>Checkpoint</h3>
@@ -327,6 +334,17 @@ function openLesson(lessonId) {
   });
 
   window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function dossierListSection(title, items, ordered = false) {
+  if (!Array.isArray(items) || !items.length) return "";
+  const tag = ordered ? "ol" : "ul";
+  return `
+    <section class="dossier-section">
+      <h3>${escapeHtml(title)}</h3>
+      <${tag}>${items.map((item) => \`<li>${escapeHtml(item)}</li>\`).join("")}</${tag}>
+    </section>
+  `;
 }
 
 function dossierSection(title, content) {
