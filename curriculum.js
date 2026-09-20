@@ -189,6 +189,121 @@ function buildLessons(){
     }
   };
 
+  const M1_STAGE_GUIDE = {
+  "Foundation": {
+    "titleSuffix": "Core Model & Intuition",
+    "body": "Build the mental model before using formal machinery. Identify the object, its meaning, its shape or state, the assumptions behind it, and one observable example. The lesson is complete only when you can explain the concept in plain language and connect it to a small computation.",
+    "practice": [
+      "Explain the concept without reading the definition.",
+      "Create one tiny numerical example.",
+      "Predict the result before running code.",
+      "Write down the invariant or assumption that must remain true."
+    ],
+    "warnings": [
+      "Do not memorize notation without knowing what each symbol represents.",
+      "Do not skip shape, units, assumptions or state.",
+      "A successful execution is not evidence of mathematical correctness."
+    ],
+    "takeaway": "Understand the object first. The notation and implementation become easier once the meaning is stable.",
+    "labPrefix": "Create a minimal working example for ",
+    "codePrefix": "# Foundation: "
+  },
+  "Derivation": {
+    "titleSuffix": "First-Principles Derivation",
+    "body": "Turn the concept into an explicit derivation. Start from definitions, expose hidden summations or intermediate quantities, and keep dimensions and assumptions visible. Every transformation should have a reason that another engineer can reproduce.",
+    "practice": [
+      "Write the central equation from definitions.",
+      "Expand one compact expression into scalar operations.",
+      "Annotate every symbol with meaning and shape.",
+      "Verify the final expression with a small numerical example."
+    ],
+    "warnings": [
+      "Do not jump over algebraic steps that carry assumptions.",
+      "Do not hide a transpose, normalization or constant factor.",
+      "Use dimensions as a consistency check."
+    ],
+    "takeaway": "A derivation is a correctness tool: it shows exactly how the mathematical specification becomes a computable relationship.",
+    "labPrefix": "Derive and numerically verify the central relationship for ",
+    "codePrefix": "# Derivation: "
+  },
+  "Implementation": {
+    "titleSuffix": "From Mathematics to Code",
+    "body": "Implement the smallest correct version of the lesson. Keep the core operation visible, add explicit input contracts, and compare the result against an independent reference. Test ordinary cases, edge cases and deliberately invalid inputs.",
+    "practice": [
+      "Implement the core operation from scratch.",
+      "Add shape, type or range validation.",
+      "Create edge-case tests.",
+      "Compare randomized cases with a trusted reference.",
+      "Record one failing case and explain why it failed."
+    ],
+    "warnings": [
+      "Correctness comes before optimization.",
+      "Do not reuse the same implementation as both code under test and reference.",
+      "Use numerical tolerance where exact floating-point equality is inappropriate."
+    ],
+    "takeaway": "Implementation is successful when the code, tests and mathematical specification agree.",
+    "labPrefix": "Build a tested implementation of ",
+    "codePrefix": "# Implementation: "
+  },
+  "Engineering": {
+    "titleSuffix": "Debugging & Root Cause",
+    "body": "Treat failures as evidence. Reproduce the smallest failing case, identify the violated contract or invariant, measure the relevant state, test one hypothesis at a time, and verify the fix with a regression test. Do not patch symptoms before understanding the cause.",
+    "practice": [
+      "Create one intentional failure.",
+      "Record the first observable symptom.",
+      "State two competing hypotheses.",
+      "Use a targeted diagnostic measurement.",
+      "Write the root cause and regression test."
+    ],
+    "warnings": [
+      "Do not fix an error by making the assertion weaker.",
+      "Do not change multiple variables during diagnosis.",
+      "Keep failed hypotheses because they document the reasoning path."
+    ],
+    "takeaway": "Good debugging converts an ambiguous symptom into a verified causal chain.",
+    "labPrefix": "Create, diagnose and permanently fix one realistic failure in ",
+    "codePrefix": "# Engineering: "
+  },
+  "Experiment": {
+    "titleSuffix": "Controlled Experiment",
+    "body": "Turn intuition into measurement. Define a baseline, change one important variable, preserve the full result set, and choose metrics before inspecting the outcome. Separate what was observed from what you think caused it.",
+    "practice": [
+      "Write the hypothesis before running the experiment.",
+      "Define baseline and controlled variables.",
+      "Record every run and configuration.",
+      "Report central results plus variability where relevant.",
+      "State what the experiment cannot establish."
+    ],
+    "warnings": [
+      "Do not cherry-pick runs.",
+      "Do not change the primary metric after seeing the results.",
+      "Do not confuse correlation with a demonstrated cause."
+    ],
+    "takeaway": "A controlled experiment is a reproducible protocol, not just a chart.",
+    "labPrefix": "Run a controlled benchmark or simulation for ",
+    "codePrefix": "# Experiment: "
+  },
+  "Research": {
+    "titleSuffix": "Falsifiable Research Study",
+    "body": "Frame a narrow technical question that could be wrong. Define the hypothesis, protocol, baseline, measurements and falsification condition before running the study. Preserve negative results and explain the limitations of what the evidence supports.",
+    "practice": [
+      "Write one falsifiable hypothesis.",
+      "Define the independent and dependent variables.",
+      "Specify the baseline and evaluation protocol.",
+      "State what result would change your conclusion.",
+      "Document limitations and the next experiment."
+    ],
+    "warnings": [
+      "Do not retrofit the hypothesis to the result.",
+      "Do not claim causality beyond the protocol.",
+      "A negative result is evidence when the experiment was valid."
+    ],
+    "takeaway": "Research begins when you can state what would prove you wrong and provide a reproducible path for someone else to check.",
+    "labPrefix": "Write and execute a small research study on ",
+    "codePrefix": "# Research: "
+  }
+};
+
   const authoredLessons = {};
   let authoredId = 1;
   for (const unit of Object.keys(M1_TEACHING)) {
@@ -196,20 +311,46 @@ function buildLessons(){
     for (const stage of ["Foundation","Derivation","Implementation","Engineering","Experiment","Research"]) {
       const stageInfo = STAGE_DETAIL[stage];
       const steps = profile.stages[stage];
+      const guide = M1_STAGE_GUIDE[stage];
       authoredLessons["L"+String(authoredId).padStart(3,"0")] = {
         whyItMatters: profile.why,
-        lessonBody: profile.start,
+        lessonBody: guide.body + " " + profile.start,
         mentalModel: profile.mental,
         vocabulary: profile.vocabulary,
-        workedExample: { title: "Worked example", text: profile.example[0], steps: ["Identify what each number represents.", "Write the object and its shape.", "Apply the operation one step at a time.", "Check whether the result makes sense."] },
-        secondExample: { title: "Second example", text: profile.example[1], steps: ["State the inputs.", "Perform the calculation or reasoning.", "Check dimensions or assumptions.", "Explain what the result means in an ML context."] },
-        practice: profile.practice,
-        beginnerWarnings: profile.warnings,
-        lab: { title: stage+" lab", objective: stageInfo.verb+" "+unit+".", steps, success: profile.lab },
+        workedExample: {
+          title: "Worked example",
+          text: profile.example[0],
+          steps: [
+            "Identify the inputs, meaning and constraints.",
+            "Write the expected shape, state or invariant.",
+            "Apply the operation one step at a time.",
+            "Verify the result independently and explain what it means."
+          ]
+        },
+        secondExample: {
+          title: "Second example",
+          text: profile.example[1],
+          steps: [
+            "State the inputs and assumptions.",
+            "Perform the calculation, implementation or diagnostic.",
+            "Check dimensions, assumptions or measurements.",
+            "Connect the result to a practical ML or systems consequence."
+          ]
+        },
+        practice: [...profile.practice, ...guide.practice],
+        beginnerWarnings: [...profile.warnings, ...guide.warnings],
+        lab: {
+          title: stage + " lab",
+          objective: guide.labPrefix + unit + ".",
+          steps,
+          success: profile.lab
+        },
         misconceptions: profile.misconceptions,
-        takeaway: profile.takeaway,
-        lessonBodyExtra: "This stage is deliberately connected to the next one. You are not expected to know everything immediately. First understand the idea, then derive it, then implement it, then learn to debug it, measure it and finally investigate it.",
-        stageSteps: steps
+        takeaway: guide.takeaway + " " + profile.takeaway,
+        lessonBodyExtra: "Module 01 follows one continuous progression: understand the concept, derive it, implement it, debug it, measure it, and investigate a falsifiable question.",
+        stageSteps: steps,
+        code: guide.codePrefix + unit + "\n# Replace this scaffold with the smallest reproducible implementation.\nresult = run_experiment(seed=42)\nprint(result)",
+        lessonTitle: stage + " · " + unit + " — " + guide.titleSuffix
       };
       authoredId++;
     }
@@ -350,7 +491,7 @@ function buildLessons(){
           moduleTitle:module.title,
           unit,
           stage,
-          title:stage+" · "+unit,
+          title:(authoredLessons["L"+String(n).padStart(3,"0")]?.lessonTitle || stage+" · "+unit),
           scope,
           order:n,
           type:stageInfo.type,
@@ -364,7 +505,7 @@ function buildLessons(){
           failure:profile ? profile.failure : "Investigate incorrect assumptions, numerical errors, leakage, instability or performance regressions.",
           evidence:profile ? profile.evidence : "Explain the concept, produce a working implementation and document the evidence.",
           deliverable:profile ? stageInfo.deliverable : "A reproducible learning artifact with code, measurements and a written explanation.",
-          code:profile ? "# "+stage+": "+unit+"\n# Build the smallest reproducible version.\nresult = run_experiment(seed=42)\nprint(result)" : "# Build the smallest reproducible experiment.\nresult = run_experiment(seed=42)\nprint(result)",
+          code:authoredLessons["L"+String(n).padStart(3,"0")]?.code || (profile ? "# "+stage+": "+unit+"\n# Build the smallest reproducible version.\nresult = run_experiment(seed=42)\nprint(result)" : "# Build the smallest reproducible experiment.\nresult = run_experiment(seed=42)\nprint(result)"),
           ...authoredLessons["L"+String(n).padStart(3,"0")],
           ...makeSupport(profile, stage, module.id==="m1" ? M1_TEACHING[unit].stages[stage] : []),
           checkpoint:[
