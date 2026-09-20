@@ -47,6 +47,8 @@ jobs:
           node --check syntax-primer.js
           node --check syntax_primer_qa.js
           node --check ui_navigation_qa.cjs
+          node --check ui-shell.js
+          node --check ui_shell_qa.cjs
 
       - name: Run learning engine tests
         run: node learning-engine.test.js
@@ -71,3 +73,6 @@ jobs:
 
       - name: Run UI navigation QA
         run: node ui_navigation_qa.cjs
+
+      - name: Run liquid shell QA
+        run: node ui_shell_qa.cjs
