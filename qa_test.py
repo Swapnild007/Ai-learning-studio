@@ -6,6 +6,8 @@ REQUIRED_FILES = [
     "index.html",
     "styles.css",
     "curriculum.js",
+    "module02.js",
+    "module02_runtime_qa.js",
     "learning-engine.js",
     "app.js",
     "server.py",
@@ -19,6 +21,7 @@ for filename in REQUIRED_FILES:
 html = (ROOT / "index.html").read_text(encoding="utf-8")
 css = (ROOT / "styles.css").read_text(encoding="utf-8")
 curriculum = (ROOT / "curriculum.js").read_text(encoding="utf-8")
+module02 = (ROOT / "module02.js").read_text(encoding="utf-8")
 engine = (ROOT / "learning-engine.js").read_text(encoding="utf-8")
 app = (ROOT / "app.js").read_text(encoding="utf-8")
 syntax = (ROOT / "syntax-primer.js").read_text(encoding="utf-8")
@@ -26,6 +29,7 @@ syntax = (ROOT / "syntax-primer.js").read_text(encoding="utf-8")
 for asset in [
     'href="styles.css',
     'src="curriculum.js',
+    'src="module02.js',
     'src="learning-engine.js',
     'src="app.js',
     'src="syntax-primer.js',
@@ -35,6 +39,19 @@ for asset in [
 assert "targetLessons:520" in curriculum
 assert "function buildLessons()" in curriculum
 assert "const LESSONS=buildLessons()" in curriculum
+
+for token in [
+    "researchBasis",
+    "masteryGate",
+    "Regression & Classification",
+    "Trees & Ensembles",
+    "Unsupervised Learning",
+    "Evaluation & Validation",
+    "ML Engineering Patterns",
+    "Stanford University",
+    "Carnegie Mellon University",
+]:
+    assert token in module02, f"Missing Module 02 research/content token: {token}"
 
 for token in [
     "recommendNextExperience",
