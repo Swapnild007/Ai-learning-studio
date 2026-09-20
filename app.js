@@ -257,6 +257,7 @@ function openLesson(lessonId) {
         </div>
 
         <h1>${escapeHtml(lesson.title)}</h1>
+        <div class="pill-row"><span class="pill">${escapeHtml(lesson.type)}</span><span class="pill">${escapeHtml(lesson.minutes)} min</span></div>
         <p class="lead">${escapeHtml(lesson.objective)}</p>
 
         <div class="dossier">
@@ -273,6 +274,7 @@ function openLesson(lessonId) {
           ${dossierSection("Experiment", lesson.experiment)}
           ${dossierSection("Failure analysis", lesson.failure)}
           ${dossierSection("Mastery evidence", lesson.evidence)}
+          ${dossierSection("Deliverable", lesson.deliverable)}
 
           <section class="dossier-section">
             <h3>Checkpoint</h3>
