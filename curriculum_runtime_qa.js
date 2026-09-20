@@ -33,7 +33,19 @@ for (const module of curriculum.modules) {
   }
 }
 
+const deepFields = ["lessonBody","mentalModel","vocabulary","math","mechanism","workedExample","secondExample","implementation","practice","beginnerWarnings","lab","experiment","failure","research","misconceptions","checkpoint","checkpointAnswers","highlights","keyNotes","stageSteps"];
 for (const lesson of lessons) {
+  if (lesson.module !== "m1") {
+    for (const field of deepFields) {
+      const value = lesson[field];
+      const empty = value == null || (Array.isArray(value) && value.length === 0) || (typeof value === "string" && !value.trim());
+      if (empty) throw new Error(`${lesson.id}: deep field missing: ${field}`);
+    }
+  }
+  if (lesson.module !== "m1" && JSON.stringify(lesson).includes("Start with the objects, assumptions and observable behavior before using a library abstraction.")) {
+    throw new Error(`${lesson.id}: generic fallback material remains`);
+  }
+
   if (!Array.isArray(lesson.checkpoint) || lesson.checkpoint.length !== 3) {
     throw new Error(`${lesson.id}: checkpoint missing or incomplete`);
   }
