@@ -17,7 +17,7 @@ for (const view of navViews) {
 if (!app.includes('$$(".nav-item").forEach')) throw new Error("Navigation binding is not using the multi-selector helper");
 if (!app.includes('$$(".nav-item").find')) throw new Error("Navigation active-state lookup is not using the multi-selector helper");
 if (!app.includes('$$("[data-tool-id]").forEach')) throw new Error("AI Tools mission binding is not using the multi-selector helper");
-if (/\$\("[^"]+"\)\.(?:forEach|find)\(/.test(app)) {
+if (/(?<!\$)\$\("[^"]+"\)\.(?:forEach|find)\(/.test(app)) {
   throw new Error("Single-element selector incorrectly used as collection: $().forEach/find()");
 }
 
