@@ -2,9 +2,10 @@ const fs = require("fs");
 const vm = require("vm");
 
 const source = fs.readFileSync("curriculum.js", "utf8");
+const depth = fs.readFileSync("curriculum-depth.js", "utf8");
 const context = {};
 vm.runInNewContext(
-  source + "\n;globalThis.__LESSONS = LESSONS; globalThis.__CURRICULUM = CURRICULUM;",
+  source + "\n" + depth + "\n;globalThis.__LESSONS = LESSONS; globalThis.__CURRICULUM = CURRICULUM;",
   context,
   { filename: "curriculum.js" }
 );
