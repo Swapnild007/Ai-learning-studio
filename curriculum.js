@@ -323,10 +323,18 @@ function buildLessons(){
 
   const makeSupport = (profile, stage, stageSteps) => {
     const support = stageSupport[stage];
+    const safeProfile = profile || {
+      focus: "the core concepts and practical skills in this lesson",
+      stages: { [stage]: stageSteps || [] }
+    };
     return {
-      checkpointAnswers: support.answers.map((answer, index) => profile.stages[stage][index] ? answer + " In this lesson, apply that principle to: " + profile.stages[stage][index] : answer),
-      highlights: [...support.highlights, "Unit focus: " + profile.focus + "."],
-      keyNotes: [...support.notes, "Stage goal: " + stageSteps[0] + "."]
+      checkpointAnswers: support.answers.map((answer, index) =>
+        safeProfile.stages[stage]?.[index]
+          ? answer + " In this lesson, apply that principle to: " + safeProfile.stages[stage][index]
+          : answer
+      ),
+      highlights: [...support.highlights, "Unit focus: " + safeProfile.focus + "."],
+      keyNotes: [...support.notes, "Stage goal: " + (stageSteps?.[0] || "demonstrate the lesson objective") + "."]
     };
   };
 
