@@ -9,7 +9,7 @@ const routeBlock = app.match(/const routes = \{([\s\S]*?)\n  \};/);
 if (!routeBlock) throw new Error("Route map not found");
 
 for (const view of navViews) {
-  if (!new RegExp("\\b" + view + "\\s*:").test(routeBlock[1])) {
+  if (!new RegExp("\\b" + view + "\\s*(?::|,)").test(routeBlock[1])) {
     throw new Error("Navigation view has no route: " + view);
   }
 }
