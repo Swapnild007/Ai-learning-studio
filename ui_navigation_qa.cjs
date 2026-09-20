@@ -4,6 +4,8 @@ const index = fs.readFileSync("index.html", "utf8");
 const app = fs.readFileSync("app.js", "utf8");
 const css = fs.readFileSync("styles.css", "utf8");
 
+if (/\$\$\$/.test(app)) throw new Error("Invalid $$ selector token found in app.js");
+
 const navViews = [...index.matchAll(/class="nav-item"[^>]*data-view="([^"]+)"/g)].map((m) => m[1]);
 const routeBlock = app.match(/const routes = \{([\s\S]*?)\n  \};/);
 if (!routeBlock) throw new Error("Route map not found");
