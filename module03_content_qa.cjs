@@ -7,12 +7,12 @@ const moduleSource = fs.readFileSync("module03.js","utf8");
 
 const context = { console, Math, Set, Map, Array, Object, String, Number, JSON };
 vm.createContext(context);
-vm.runInContext(curriculumSource, context);
-assert.strictEqual(context.LESSONS.length, 520, "curriculum must contain 520 lessons");
-assert.strictEqual(context.LESSONS.filter(x=>x.module==="m3").length, 98, "Module 03 must contain 98 lessons");
+vm.runInContext(curriculumSource + "\\nthis.__CURRICULUM=CURRICULUM; this.__LESSONS=LESSONS;", context);
+assert.strictEqual(context.__LESSONS.length, 520, "curriculum must contain 520 lessons");
+assert.strictEqual(context.__LESSONS.filter(x=>x.module==="m3").length, 98, "Module 03 must contain 98 lessons");
 
 vm.runInContext(moduleSource, context);
-const lessons=context.LESSONS.filter(x=>x.module==="m3");
+const lessons=context.__LESSONS.filter(x=>x.module==="m3");
 assert.strictEqual(lessons.length,98);
 
 const units=[...new Set(lessons.map(x=>x.unit))];
@@ -67,7 +67,7 @@ assert.ok(labSource.includes("Long-Sequence Pressure"));
 assert.ok(labSource.includes("Learning-Rate Stability"));
 
 console.log(JSON.stringify({
-  total:context.LESSONS.length,
+  total:context.__LESSONS.length,
   module03:lessons.length,
   authoredCore:30,
   practice:68,
