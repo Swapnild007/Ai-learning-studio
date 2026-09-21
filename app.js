@@ -270,8 +270,8 @@ function bindModule02Interaction() {
 }
 
 function beginnerMathBridge(lesson) {
-  if (!window.BeginnerMathBridge || lesson.module !== "m3") return "";
-  return window.BeginnerMathBridge.render(lesson.unit);
+  if (!window.BeginnerMathBridge) return "";
+  return window.BeginnerMathBridge.render(lesson);
 }
 
 function module03Interaction(lesson) {
