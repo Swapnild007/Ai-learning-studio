@@ -269,6 +269,11 @@ function bindModule02Interaction() {
   if (window.Module02Labs) window.Module02Labs.bind();
 }
 
+function beginnerMathBridge(lesson) {
+  if (!window.BeginnerMathBridge || lesson.module !== "m3") return "";
+  return window.BeginnerMathBridge.render(lesson.unit);
+}
+
 function module03Interaction(lesson) {
   if (lesson.module !== "m3" || !window.Module03Labs) return "";
   return window.Module03Labs.render(lesson);
@@ -310,6 +315,7 @@ function openLesson(lessonId) {
           ${lesson.workedExample ? dossierSection(lesson.workedExample.title, lesson.workedExample.text + " " + lesson.workedExample.steps.join(" ")) : ""}
           ${lesson.secondExample ? dossierSection(lesson.secondExample.title, lesson.secondExample.text + " " + lesson.secondExample.steps.join(" ")) : ""}\n          ${module02Interaction(lesson)}
           ${module03Interaction(lesson)}
+          ${beginnerMathBridge(lesson)}
 
           <section class="dossier-section">
             <h3>Implementation</h3>
