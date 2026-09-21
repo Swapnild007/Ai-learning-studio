@@ -181,3 +181,6 @@ main{position:relative}
   .math-bridge-grid,.math-bridge-vocab{grid-template-columns:1fr}
   .math-bridge{padding:16px}
 }
+
+.math-bridge-source{margin-top:10px;padding-top:10px;border-top:1px solid rgba(148,163,184,.14);font-size:13px;color:var(--muted)}
+.math-bridge-rule{margin:10px 0 0;color:var(--muted);line-height:1.7}
