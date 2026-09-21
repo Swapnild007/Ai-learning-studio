@@ -160,3 +160,24 @@ main{position:relative}
 @media(prefers-reduced-motion:reduce){
   .m3-real-lab *{scroll-behavior:auto}
 }
+
+
+/* Beginner mathematics bridge */
+.math-bridge{margin:18px 0;padding:20px;border-radius:22px;background:linear-gradient(145deg,rgba(239,246,255,.9),rgba(255,255,255,.82));border:1px solid rgba(37,99,235,.12)}
+.math-bridge h3{margin:5px 0 8px}
+.math-bridge-plain{font-size:15px;line-height:1.7;margin:0;color:var(--text)}
+.math-bridge-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+.math-bridge-grid>div{padding:15px;border-radius:16px;background:rgba(255,255,255,.72);border:1px solid rgba(148,163,184,.15)}
+.math-bridge-grid strong{display:block;margin-bottom:8px}
+.math-bridge-grid ol{margin:0;padding-left:20px;color:var(--muted);line-height:1.7}
+.math-bridge-grid p{margin:0;color:var(--muted);line-height:1.7}
+.math-bridge details{margin-top:12px}
+.math-bridge summary{cursor:pointer;font-weight:650}
+.math-bridge-vocab{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.math-bridge-vocab div{display:flex;gap:10px;align-items:baseline;padding:9px 11px;border-radius:12px;background:rgba(255,255,255,.65)}
+.math-bridge-vocab code{font-weight:700;color:#1857d7}
+.math-bridge-vocab span{color:var(--muted);font-size:12px}
+@media(max-width:760px){
+  .math-bridge-grid,.math-bridge-vocab{grid-template-columns:1fr}
+  .math-bridge{padding:16px}
+}
