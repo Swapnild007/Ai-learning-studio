@@ -1,116 +1,93 @@
 /* Beginner Mathematics Bridge
-   A non-counted support layer for learners who are new to algebra and AI mathematics.
+   Non-counted support layer for ALL 520 lessons.
+   It teaches notation from plain language before formal manipulation.
 */
 (() => {
-  const MATH_BRIDGE = {
-    "Neural Network Foundations": {
-      title: "Math bridge: what the symbols mean",
-      plain: "A parameter is simply a number the model can learn. A neural network learns many numbers and uses them to transform inputs.",
-      steps: [
-        "Read C_in as: how many input channels enter the layer.",
-        "Read C_out as: how many filters the layer learns.",
-        "Read K_h × K_w as: the height × width of one filter.",
-        "Multiply the pieces to count weights, then add one bias for each filter."
-      ],
-      example: "For 3 input channels, 8 filters and a 3×3 kernel: 8 × (3 × 3 × 3) + 8 = 224 trainable parameters.",
-      vocabulary: {
-        "C_in": "input channels",
-        "C_out": "number of filters / output channels",
-        "K_h": "kernel height",
-        "K_w": "kernel width",
-        "parameter": "a number learned during training",
-        "bias": "one additional learned number for each filter"
-      }
-    },
-    "Convolutional Learning": {
-      title: "Math bridge: parameter counting",
-      plain: "The parameter-count equation is only repeated multiplication and addition. It tells you how many learnable numbers are inside a convolution layer.",
-      steps: [
-        "Count the numbers in one kernel: K_h × K_w.",
-        "Multiply by C_in because the kernel has one slice for every input channel.",
-        "Multiply by C_out because we have multiple filters.",
-        "Add C_out biases if the layer uses bias."
-      ],
-      example: "A 3×3 convolution with 3 input channels and 8 filters has 8 × (3 × 3 × 3) + 8 = 224 parameters.",
-      vocabulary: {
-        "kernel": "small grid of learned numbers",
-        "channel": "one feature plane, such as red/green/blue",
-        "filter": "the complete set of kernel weights used to produce one output channel",
-        "parameter": "a learned number"
-      }
-    },
-    "Sequence Models": {
-      title: "Math bridge: a formula is a recipe",
-      plain: "When you see h_t = f(h_{t-1}, x_t), read it as: the new hidden state is calculated from the previous hidden state and the current input.",
-      steps: [
-        "h_t means the hidden state at the current time step.",
-        "h_{t-1} means the hidden state from the previous step.",
-        "x_t means the current input.",
-        "f means 'apply this calculation'."
-      ],
-      example: "If a sequence has five inputs, the model updates its hidden state five times, reusing the same learned rules.",
-      vocabulary: {
-        "t": "position or time step",
-        "h": "hidden state",
-        "x": "input",
-        "f": "a function: a rule that turns inputs into an output"
-      }
-    },
-    "Transformer Foundations": {
-      title: "Math bridge: matrices are tables of numbers",
-      plain: "Attention is mostly matrix multiplication, scaling and probability calculation. You do not need to memorize the notation first.",
-      steps: [
-        "Q, K and V are tables of numbers called matrices.",
-        "QKᵀ compares every query with every key.",
-        "Divide by √d_k to control the scale of the scores.",
-        "Softmax converts scores into weights that add up to 1.",
-        "Multiply those weights by V to create the output."
-      ],
-      example: "If four tokens are present, the attention-score table has 4×4 = 16 pairwise scores.",
-      vocabulary: {
-        "matrix": "a rectangular table of numbers",
-        "transpose": "turn rows into columns",
-        "score": "a number measuring compatibility",
-        "softmax": "a calculation that turns scores into probabilities that add to 1"
-      }
-    },
-    "Training Dynamics": {
-      title: "Math bridge: learning rate and updates",
-      plain: "A learning rate controls how large a step the model takes when changing its parameters.",
-      steps: [
-        "The gradient tells us which direction increases the loss.",
-        "The optimizer moves in the opposite direction to reduce the loss.",
-        "The learning rate controls the size of that move.",
-        "A step that is too large can overshoot; a very small step can make learning slow."
-      ],
-      example: "If a parameter is 4, its gradient is 2 and the learning rate is 0.1, a simple gradient-descent update gives 4 − (0.1 × 2) = 3.8.",
-      vocabulary: {
-        "gradient": "a direction-and-size signal telling the optimizer how the loss changes",
-        "learning rate": "the size of an optimization step",
-        "loss": "a number measuring how wrong the model is",
-        "update": "the change made to a parameter"
-      }
-    }
+  const UNIT_GUIDES = {
+    "Linear Algebra":["numbers in rows/columns","vectors as lists of numbers","matrix multiplication as repeated dot products","dimensions must agree before multiplication"],
+    "Probability & Statistics":["probability as a number from 0 to 1","mean as an average","variance as squared distance from the mean","samples are observations, not the whole population"],
+    "Calculus & Optimization":["a function maps input to output","a derivative measures local change","a gradient contains many partial derivatives","optimization repeatedly changes parameters to reduce an objective"],
+    "Algorithms & Data Structures":["an algorithm is a repeatable procedure","input size controls computational cost","data structures organize information for operations","complexity describes how cost grows"],
+    "Systems Foundations":["memory is finite storage","latency is time per operation","throughput is work per unit time","concurrency means multiple activities can make progress"],
+    "Regression & Classification":["features are inputs","the target is what we predict","a model is a rule with parameters","loss measures prediction error"],
+    "Trees & Ensembles":["a split divides examples","impurity measures how mixed a node is","depth controls tree complexity","ensembles combine multiple learners"],
+    "Unsupervised Learning":["there is no target label to supervise the model","distance measures similarity","a cluster is a group under a chosen rule","dimensionality reduction creates a smaller representation"],
+    "Evaluation & Validation":["training data is used to fit","validation data supports model choices","test data is reserved for final assessment","a metric is a measurement, not a conclusion by itself"],
+    "ML Engineering Patterns":["a baseline is a reference point","reproducibility means the same protocol can be rerun","a pipeline is a sequence of transformations","diagnostics turn failures into measurable evidence"],
+    "Neural Network Foundations":["a parameter is a learned number","a tensor is a structured collection of numbers","the forward pass computes a prediction","backpropagation computes derivatives of the loss"],
+    "Convolutional Learning":["a kernel is a small grid of learned numbers","channels are feature planes","stride controls how far a kernel moves","the receptive field is the input region that can affect a unit"],
+    "Sequence Models":["a sequence is ordered data","t is a position in the sequence","hidden state carries information between steps","recurrence reuses the same transition rule"],
+    "Transformer Foundations":["a matrix is a rectangular table of numbers","Q, K and V are learned representations","a transpose swaps rows and columns","softmax turns scores into weights that sum to 1"],
+    "Training Dynamics":["loss measures error","a gradient describes how loss changes","learning rate controls update size","regularization changes the training objective or effective capacity"],
+    "Information Retrieval":["an embedding is a vector representation","similarity compares representations","ranking orders candidates","retrieval quality needs an evaluation metric"],
+    "Reinforcement Learning":["an agent takes actions","a state describes the situation","a reward is feedback from the environment","a policy maps states to actions"],
+    "Reasoning Systems":["a search tree contains candidate reasoning paths","a verifier checks a proposed result","self-consistency compares multiple sampled solutions","evaluation requires a defined criterion"],
+    "Distributed ML":["data parallelism splits examples across workers","tensor parallelism splits computation","communication has a cost","scaling efficiency compares added compute with added throughput"],
+    "Multimodal AI":["a modality is a type of information","an encoder creates a representation","alignment connects representations across modalities","fusion combines information"],
+    "LLM Architecture":["tokens are discrete pieces of text","embeddings map tokens to vectors","attention mixes information between positions","KV cache stores past key/value states for efficient decoding"],
+    "Pretraining & Adaptation":["pretraining learns from a large corpus","fine-tuning changes model behavior using a task dataset","PEFT updates a smaller parameter set","LoRA represents an update with low-rank matrices"],
+    "Post-training":["preference data expresses relative choices","a reward model estimates preference","DPO directly optimizes preference comparisons","RLHF uses reinforcement learning with learned feedback"],
+    "RAG & Tool Use":["retrieval supplies external context","a tool is an external operation","memory stores selected information","orchestration controls the sequence of actions"],
+    "Agent Evaluation & Safety":["an agent can choose actions","an evaluation defines success","prompt injection attempts to alter instructions","red-teaming searches for failures deliberately"],
+    "GPU & Inference Systems":["a kernel is a unit of GPU computation","batching processes multiple requests together","quantization uses lower-precision numbers","latency is response time"],
+    "Cloud & MLOps":["a container packages software and dependencies","CI runs automated checks","a model registry tracks model artifacts","monitoring observes production behavior"],
+    "Performance Engineering":["profiling measures where time is spent","memory is a finite resource","throughput measures work per unit time","a bottleneck is a limiting stage"],
+    "Research Engineering":["a hypothesis is a testable claim","an ablation removes one component","a negative result is still evidence","a technical note separates evidence from interpretation"],
+    "Portfolio & Interview Engineering":["a system design states constraints and interfaces","debugging starts from observable symptoms","a coding solution needs correctness evidence","a portfolio artifact should show what was built and measured"]
   };
 
-  function get(unit) {
-    return MATH_BRIDGE[unit] || null;
+  const STAGE_GUIDES = {
+    Foundation:"First understand the objects and the words. Do not memorize the equation yet.",
+    Derivation:"Start with the simplest definition, substitute small numbers, then build the formal equation.",
+    Implementation:"Translate each mathematical object into a variable or data structure before writing the algorithm.",
+    Engineering:"Find the invariant that should remain true, measure the failure, then change one thing at a time.",
+    Experiment:"Write the baseline, variable, metric and expected behavior before looking at the result.",
+    Research:"State what would convince you that the idea is wrong. Then collect evidence without hiding negative results."
+  };
+
+  function esc(value) {
+    if (typeof escapeHtml === "function") return escapeHtml(String(value));
+    return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
-  function render(unit) {
-    const item = get(unit);
-    if (!item) return "";
+  function symbols(math) {
+    if (!math) return [];
+    const found = String(math).match(/[A-Za-z][A-Za-z0-9_]*(?:_[A-Za-z0-9]+)?|√[A-Za-z0-9_]+|∑|∂|∇|×|÷|≤|≥|→|∈|^\d+/g) || [];
+    return [...new Set(found)].filter(x => x.length <= 14).slice(0, 10);
+  }
+
+  function render(lesson) {
+    if (!lesson) return "";
+    const unit = lesson.unit || "";
+    const stage = lesson.stage || "Foundation";
+    const guide = UNIT_GUIDES[unit] || [
+      "read every symbol as a name before treating it as mathematics",
+      "use small numbers first",
+      "track what each input and output represents",
+      "connect the calculation to the model behavior"
+    ];
+    const math = lesson.math || "This lesson does not require a separate mathematical expression yet.";
+    const tokenList = symbols(math);
+
     return `<section class="math-bridge card">
-      <div class="module-num">BEGINNER MATH BRIDGE</div>
-      <h3>${escapeHtml(item.title)}</h3>
-      <p class="math-bridge-plain">${escapeHtml(item.plain)}</p>
+      <div class="module-num">BEGINNER MATH COACH · ${esc(stage)}</div>
+      <h3>Math before notation</h3>
+      <p class="math-bridge-plain">You do not need to know this equation already. Start with the meaning, then rebuild the notation one piece at a time.</p>
       <div class="math-bridge-grid">
-        <div><strong>Read it step by step</strong><ol>${item.steps.map(x => `<li>${escapeHtml(x)}</li>`).join("")}</ol></div>
-        <div><strong>Concrete example</strong><p>${escapeHtml(item.example)}</p></div>
+        <div>
+          <strong>Start with these ideas</strong>
+          <ol>${guide.map(x => `<li>${esc(x)}</li>`).join("")}</ol>
+        </div>
+        <div>
+          <strong>How to approach this stage</strong>
+          <p>${esc(STAGE_GUIDES[stage] || STAGE_GUIDES.Foundation)}</p>
+          <p class="math-bridge-source"><strong>This lesson's mathematical focus:</strong> ${esc(math)}</p>
+        </div>
       </div>
-      <details><summary>Vocabulary</summary><div class="math-bridge-vocab">${Object.entries(item.vocabulary).map(([k,v]) => `<div><code>${escapeHtml(k)}</code><span>${escapeHtml(v)}</span></div>`).join("")}</div></details>
+      ${tokenList.length ? `<details><summary>See the symbols before calculating</summary><div class="math-bridge-vocab">${tokenList.map(x => `<div><code>${esc(x)}</code><span>Pause here and identify what this symbol represents in this lesson before calculating with it.</span></div>`).join("")}</div></details>` : ""}
+      <details><summary>Beginner rule</summary><p class="math-bridge-rule">If a formula feels too fast: <strong>name every symbol → use tiny numbers → calculate one operation at a time → explain what the result means.</strong></p></details>
     </section>`;
   }
 
-  window.BeginnerMathBridge = { get, render };
+  window.BeginnerMathBridge = { render, guides: UNIT_GUIDES };
 })();
